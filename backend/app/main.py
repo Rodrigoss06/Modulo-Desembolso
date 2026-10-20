@@ -15,6 +15,7 @@ from .api.rutas import api, salud
 from .config import Config
 from .core.correlacion import MiddlewareCorrelacion
 from .core.errores import registrar_manejadores
+from .core.registro import configurar_registros
 from .core.seguridad import VerificadorJWT
 from .integraciones.bus import ClienteBus
 from .integraciones.modulos import Modulos
@@ -24,7 +25,7 @@ from .servicios.operacion import Conciliador, Despachador, Operacion, Recuperado
 from .servicios.ordenes import ServicioOrdenes
 from .servicios.reversiones import ServicioReversiones
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+configurar_registros()
 log = logging.getLogger("desembolso")
 
 
