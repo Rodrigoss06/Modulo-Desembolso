@@ -1,0 +1,19 @@
+flowchart TB
+  OP(["Operador / Supervisor · navegador en agencia"])
+  FE["<b>Frontend Next.js</b> · puerto 3000<br/>Pantallas (App Router) · Route Handlers BFF<br/>sesión JWT en cookie httpOnly"]
+  API["<b>Desembolso API · FastAPI</b> · puerto 8000<br/>routers /api/v1 · servicios · dominio<br/>trabajos: recuperador y despachador outbox"]
+  DB[("<b>MySQL 8.4</b><br/>tablas des_*")]
+  BUS["<b>Bus de Servicios</b> · REST JSON · X-Correlation-ID<br/>(simulador en desarrollo · puerto 9000)"]
+  EVA["Evaluación"]
+  CLI["Clientes"]
+  CTA["Cuentas"]
+  COB["Cobranza"]
+  SEG["Seguridad<br/>OAuth2 · JWKS"]
+  OP -->|HTTPS| FE -->|"REST · Bearer JWT"| API
+  API --> DB
+  API --> BUS
+  BUS --> EVA
+  BUS --> CLI
+  BUS --> CTA
+  BUS --> COB
+  BUS --> SEG

@@ -1,0 +1,15 @@
+stateDiagram-v2
+  [*] --> PREPARADA: preparar
+  PREPARADA --> VALIDADA: identidad y cuenta aprobadas
+  VALIDADA --> PREPARADA: validación cambiada o vencida
+  PREPARADA --> RECHAZADA: aprobación no habilitada
+  VALIDADA --> RECHAZADA: revalidación fallida
+  VALIDADA --> EN_PROCESO: confirmar
+  EN_PROCESO --> CONFIRMADA: Cuentas confirma
+  EN_PROCESO --> RECHAZADA: Cuentas rechaza
+  EN_PROCESO --> POR_VERIFICAR: timeout o error
+  POR_VERIFICAR --> CONFIRMADA: consulta confirma
+  POR_VERIFICAR --> RECHAZADA: rechazado o no registrado
+  CONFIRMADA --> REVERTIDA: reversión confirmada
+  RECHAZADA --> [*]
+  REVERTIDA --> [*]

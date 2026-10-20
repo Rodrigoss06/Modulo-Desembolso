@@ -1,0 +1,14 @@
+flowchart TB
+  subgraph APP["backend/app"]
+    API["api/<br/>routers y esquemas Pydantic"] --> SRV["servicios/<br/>casos de uso"]
+    SRV --> DOM["dominio/<br/>estados, transiciones y errores"]
+    SRV --> PER["persistencia/<br/>modelos SQLAlchemy y repositorio"]
+    SRV --> INT["integraciones/<br/>Evaluación · Clientes · Cuentas · Cobranza · Seguridad"]
+    TRB["trabajos/<br/>recuperador y despachador"] --> SRV
+    CORE["core/<br/>configuración · JWT y permisos · errores<br/>correlación · UUID v7 · enmascarado"]
+  end
+  PER --> DB[("MySQL")]
+  INT --> BUS["Bus de Servicios"]
+  CORE -.-> API
+  CORE -.-> SRV
+  CORE -.-> INT

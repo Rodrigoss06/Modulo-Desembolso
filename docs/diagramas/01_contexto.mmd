@@ -1,0 +1,13 @@
+flowchart TB
+  CAP["10. Captación de Clientes"] -->|CR-INT-01| SOL["11. Solicitud de Crédito"]
+  SOL -->|CR-INT-02| EVA["12. Evaluación"]
+  EVA -->|CR-INT-03| SOL
+  EVA -->|"CR-INT-04 · aprobación habilitada"| DES[["13. DESEMBOLSO"]]
+  DES -->|"CR-INT-06 · desembolso confirmado"| COB["14. Cobranza"]
+  DES -->|"CR-INT-05 · elegibilidad y abono"| CTA["3. Cuentas"]
+  COB -->|CR-INT-07| CTA
+  HB["Home Banking"] -->|CR-INT-08| COB
+  DES -.->|"CR-INT-10 · eventos críticos"| SEG["9. Seguridad / Auditoría"]
+  DES -.->|"identidad (OBS-DES-08)"| CLI["2. Clientes"]
+  classDef foco fill:#0b3d6e,color:#ffffff,stroke:#0b3d6e,stroke-width:2px
+  class DES foco

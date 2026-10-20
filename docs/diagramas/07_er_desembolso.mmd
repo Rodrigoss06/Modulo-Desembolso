@@ -1,0 +1,56 @@
+erDiagram
+  direction LR
+  DES_ORDEN ||--o{ DES_VALIDACION : "evidencia"
+  DES_ORDEN ||--o{ DES_EVENTO_ENTREGA : "outbox"
+  DES_ORDEN ||--o{ DES_SOLICITUD_REVERSION : "reversion"
+  DES_ORDEN |o..o{ DES_AUDITORIA : "bitacora"
+  DES_ORDEN {
+    char36 id PK
+    varchar codigo_orden UK
+    varchar aprobacion_id "Evaluacion"
+    varchar credito_id "Solicitud"
+    varchar cliente_id "Clientes"
+    varchar cuenta_id "Cuentas"
+    decimal importe
+    char3 moneda
+    enum estado
+    enum entrega_estado
+    varchar operacion_financiera_id
+    datetime fecha_efectiva
+    char36 idempotency_key UK
+    char64 request_hash
+    int version
+    varchar credito_en_ejecucion UK
+  }
+  DES_VALIDACION {
+    char36 id PK
+    char36 orden_id FK
+    enum tipo
+    enum fase
+    enum resultado
+    varchar referencia_evidencia
+  }
+  DES_EVENTO_ENTREGA {
+    char36 id PK
+    char36 orden_id FK
+    varchar tipo
+    json payload
+    enum estado
+    smallint intentos
+  }
+  DES_SOLICITUD_REVERSION {
+    char36 id PK
+    char36 orden_id FK
+    varchar solicitante_id
+    varchar autorizador_id
+    enum estado
+    char36 idempotency_key UK
+  }
+  DES_AUDITORIA {
+    bigint id PK
+    char36 orden_id
+    varchar actor_id
+    varchar accion
+    char36 correlation_id
+    json detalle
+  }

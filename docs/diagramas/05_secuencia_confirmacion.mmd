@@ -1,0 +1,30 @@
+%%{init: {"sequence": {"actorMargin": 22, "width": 112, "boxMargin": 6, "messageMargin": 26, "noteMargin": 6}}}%%
+sequenceDiagram
+  autonumber
+  actor OP as Operador
+  participant FE as Frontend
+  participant API as Desembolso
+  participant DB as MySQL
+  participant EVA as Evaluación
+  participant CTA as Cuentas
+  participant COB as Cobranza
+  OP->>FE: Confirmar
+  FE->>API: POST confirmación (clave)
+  API->>EVA: Revalidar aprobación
+  API->>CTA: Revalidar cuenta
+  API->>DB: EN_PROCESO + COMMIT
+  API->>CTA: Abono (misma clave)
+  alt Confirmado
+    CTA-->>API: operación y fecha
+    API->>DB: CONFIRMADA + outbox
+  else Rechazado
+    CTA-->>API: motivo
+    API->>DB: RECHAZADA
+  else Sin respuesta
+    API->>DB: POR_VERIFICAR
+  end
+  API-->>FE: estado de la orden
+  Note over API,COB: Despachador outbox (asíncrono)
+  API->>COB: desembolso.confirmado
+  COB-->>API: acuse
+  API->>DB: entrega CONFIRMADA

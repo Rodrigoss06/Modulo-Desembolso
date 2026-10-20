@@ -1,0 +1,16 @@
+flowchart TB
+  subgraph PREP["Preparación · pantallas 1 y 2"]
+    direction LR
+    A(["Cliente titular<br/>en agencia"]) --> B["Buscar créditos<br/>habilitados"] --> C{"¿Aprobación<br/>habilitada?"}
+    C -- No --> C1["Informar motivo<br/>sin continuar"]
+    C -- Sí --> D["Preparar orden<br/>importe y moneda<br/>de la aprobación"] --> E["Validar identidad<br/>con Clientes"] --> G["Elegir cuenta<br/>de ahorros elegible"]
+  end
+  subgraph EJEC["Confirmación y ejecución · pantallas 3 y 4"]
+    direction LR
+    I["Orden VALIDADA<br/>resumen"] --> K["Revalidar aprobación,<br/>cuenta e identidad<br/>y antifraude"] --> M["EN_PROCESO<br/>abono en Cuentas"] --> N{"Respuesta<br/>de Cuentas"}
+    N -- Confirmado --> O["CONFIRMADA<br/>constancia y evento<br/>a Cobranza"]
+    N -- Rechazado --> R["RECHAZADA<br/>con motivo"]
+    N -- "Sin respuesta" --> Q["POR_VERIFICAR<br/>consulta por la<br/>misma clave"] --> N
+    K -- "No vigente" --> R
+  end
+  PREP --> EJEC

@@ -1,0 +1,14 @@
+{
+  "name": "herramientas-informe",
+  "private": true,
+  "type": "module",
+  "description": "Genera los diagramas y las capturas del informe tecnico del modulo Desembolso",
+  "scripts": {
+    "diagramas": "node render-diagramas.mjs",
+    "capturas": "node capturas.mjs"
+  },
+  "devDependencies": {
+    "mermaid": "12.2.0",
+    "playwright": "1.64.1"
+  }
+}
