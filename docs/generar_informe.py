@@ -708,7 +708,7 @@ tabla("Códigos de error principales", ["HTTP", "Código", "Situación"], [
     ["401 / 403", "NO_AUTENTICADO · PERMISO_DENEGADO", "Token ausente o inválido · permiso insuficiente (se audita)."],
     ["404", "ORDEN_NO_ENCONTRADA · APROBACION_NO_ENCONTRADA", "Recurso inexistente, sin revelar datos de terceros."],
     ["409", "IDEMPOTENCIA_CONFLICTO · VERSION_CONFLICTO · ESTADO_INVALIDO · CREDITO_CON_DESEMBOLSO", "Clave con otro contenido · versión desactualizada · acción no válida en el estado · crédito ya en ejecución o desembolsado."],
-    ["422", "APROBACION_NO_HABILITADA · IDENTIDAD_RECHAZADA · CUENTA_NO_ELEGIBLE · MONEDA_DISTINTA · VALIDACIONES_INCOMPLETAS · REVALIDACION_FALLIDA", "Reglas de negocio no satisfechas."],
+    ["422", "APROBACION_NO_HABILITADA · IDENTIDAD_RECHAZADA · CUENTA_NO_ELEGIBLE · MONEDA_DISTINTA · VALIDACIONES_INCOMPLETAS · VALIDACION_VENCIDA · REVALIDACION_FALLIDA", "Reglas de negocio no satisfechas."],
     ["409", "REVERSION_DESHABILITADA · AUTORIZADOR_INVALIDO", "Política no aprobada · cuatro ojos."],
     ["503", "DEPENDENCIA_NO_DISPONIBLE · CONCILIACION_INCOMPLETA", "Un módulo contraparte no respondió."],
 ], [1.7, 7.0, 7.7], tam=9)
@@ -762,6 +762,9 @@ tabla("Pantallas del módulo", ["Pantalla", "Ruta", "Campos y acciones"], [
     ["Conciliación", "/conciliacion", "Fecha y moneda; totales y diferencias por origen."],
     ["Reversiones", "/reversiones", "Solicitudes y decisión de un supervisor distinto; aviso cuando la política está deshabilitada."],
 ], [3.4, 3.4, 9.6], tam=9.5)
+parrafo("Las capturas siguientes se tomaron del sistema en ejecución (frontend, API, MySQL 8.4 y simulador "
+        "del Bus) con Playwright, recorriendo los flujos reales: desembolso completo, respuesta perdida de "
+        "Cuentas, caída de Cobranza, rechazo de Cuentas e identidad rechazada. Los datos son sintéticos.")
 CAPTURAS_INFORME = [
     ("01_login.png", "Inicio de sesión contra el servicio de Seguridad."),
     ("02_consulta_creditos.png", "Pantalla 1. Consulta de créditos habilitados."),
@@ -823,6 +826,11 @@ cd ..\\simuladores; python -m venv .venv; .venv\\Scripts\\pip install -r require
 cd ..\\backend; python -m venv .venv; .venv\\Scripts\\pip install -r requirements-dev.txt
 copy .env.example .env; .venv\\Scripts\\uvicorn app.main:app --port 8000
 cd ..\\frontend; npm install; copy .env.example .env.local; npm run dev""")
+tabla("Usuarios del simulador de Seguridad (solo desarrollo; contraseña Demo2026!)", ["Usuario", "Rol", "Uso"], [
+    ["operador1 · operador2", "OPERADOR_AGENCIA", "Preparar, validar, confirmar y consultar."],
+    ["supervisor1 · supervisor2", "SUPERVISOR", "Monitor, conciliación, reintentos y decisión de reversiones (cuatro ojos)."],
+    ["auditor1", "AUDITOR", "Consultas, bitácora y conciliación sin ejecutar."],
+], [4.4, 4.0, 8.0])
 tabla("Ambientes", ["Ambiente", "Características"], [
     ["Desarrollo", "Datos sintéticos, simulador del Bus y MySQL local; reversión deshabilitada por defecto."],
     ["Testing", "Integración con los módulos reales a través del Bus; evidencias de I-06."],
@@ -869,6 +877,7 @@ ESCENARIOS = [
     ("Cuentas rechaza el abono", "RECHAZADA con motivo; sin operación.", "test_rechazo_de_cuentas"),
     ("Cuentas confirma y se pierde la respuesta", "POR_VERIFICAR y luego CONFIRMADA sin duplicar el abono.", "test_respuesta_perdida_se_recupera_sin_duplicar"),
     ("Cobranza no disponible", "El desembolso sigue confirmado y la entrega pendiente.", "test_cobranza_caida_mantiene_confirmado"),
+    ("Entrega fallida tras los reintentos", "Evento FALLIDO visible en el monitor; el reintento manual lo entrega.", "test_entrega_fallida_tras_reintentos_y_reintento_manual"),
     ("Reenvío del mismo evento", "Cobranza no activa dos veces el crédito.", "test_reenvio_evento_no_duplica_activacion"),
     ("Acceso sin permisos", "403 y registro en la bitácora.", "test_acceso_sin_permiso_es_auditado"),
     ("Constancia de orden no confirmada", "No se emite.", "test_constancia_solo_confirmada"),
