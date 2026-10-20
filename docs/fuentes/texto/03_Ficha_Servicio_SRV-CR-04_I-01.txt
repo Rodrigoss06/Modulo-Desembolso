@@ -1,0 +1,552 @@
+   UNIVERSIDAD CATÓLICA DE SANTA MARÍA
+
+ FACULTAD DE CIENCIAS E INGENIERÍAS FÍSICAS Y FORMALES
+       ESCUELA PROFESIONAL DE INGENIERÍA DE SISTEMAS
+
+        CURSO: Gestión de Sistemas y Tecnologías de la Información
+                 DOCENTES: Jorge Martínez; Mario Santillana
+
+Servicios de TI y valor generado del módulo
+                     Desembolso
+
+                      Actividad I-01 | Fase II ITIL 4
+
+                             COMITÉ: Comité de Créditos
+          MÓDULO RESPONSABLE DEL INFORME: Desembolso
+
+                            INTEGRANTES DEL GRUPO
+                            Reaño Soto Iván Edgardo (líder)
+
+                               Centeno Lopez Jose Alfredo
+                                Nuñez Arista Piero Bruker
+                        Sucapuca Santamarina Rodrigo Alonso
+
+                          Arequipa, 2026
+Equipo y control del documento
+
+Servicios de TI del módulo Desembolso. Actividad I-01 de la Fase II ITIL 4. Fecha de elaboración: 11 de
+octubre de 2026.
+
+Tabla 1
+Integrantes del módulo Desembolso
+
+                         Apellidos y nombres                 Rol
+
+Reaño Soto Iván Edgardo                          Líder del módulo
+
+Centeno Lopez Jose Alfredo                       Integrante
+
+Nuñez Arista Piero Bruker                        Integrante
+
+Sucapuca Santamarina Rodrigo Alonso              Integrante
+
+Tabla 2                                                              Contenido
+Control del documento      1.1
+
+            Campo          Para revisión y consolidación del Comité de Créditos
+ Versión                   Plataforma Digital Banco Nacional de Arequipa (BNA)
+ Estado
+ Proyecto                  Desembolso (DES), Línea de Créditos
+ Módulo                    Iván Edgardo Reaño Soto
+ Líder del módulo          I-01: identificar los servicios de TI y el valor que generan. Período de la guía:
+                           28/09/2026 al 04/10/2026.
+ Actividad                 Guía de Inicio de Fase II, Plantilla de Ficha de Servicio TI, Referencia TOGAF y
+                           matriz CR-INT, Lineamiento Técnico Común y antecedentes del módulo.
+ Base documental           Comité de Créditos; Tecnología, Seguridad y módulos contraparte para las
+                           decisiones pendientes.
+ Instancias de revisión
+
+La ficha se presenta para incorporar el servicio a la matriz preliminar de Créditos. El código SRV-CR-04 es
+propuesto y permanece sujeto a la codificación uniforme del Comité.
+
+                                              2
+                                         ÍNDICE
+
+Equipo y control del documento .......................................................................................................................... 2
+Resumen ejecutivo............................................................................................................................................... 4
+1 Alcance de la actividad I-01 ............................................................................................................................. 4
+
+   1.1 Entregable y límites de la actividad ........................................................................................................... 4
+   1.2 Criterio para identificar el servicio............................................................................................................. 4
+2 Ficha de identificación del servicio SRV-CR-04 .............................................................................................. 5
+   2.1 Descripción del servicio............................................................................................................................. 5
+   2.2 Consumidores ............................................................................................................................................ 5
+   2.3 Entrada principal........................................................................................................................................ 6
+   2.4 Salida y resultado....................................................................................................................................... 6
+   2.5 Valor para el cliente ................................................................................................................................... 7
+   2.6 Valor para el BNA ..................................................................................................................................... 7
+   2.7 Dependencias ............................................................................................................................................. 8
+   2.8 Tecnología habilitadora ............................................................................................................................. 9
+   2.9 Observaciones y pendientes ..................................................................................................................... 10
+3 Validación contra TOGAF y la matriz CR-INT.............................................................................................. 11
+4 Plan de trabajo y siguientes pasos ................................................................................................................... 11
+5 Conclusiones................................................................................................................................................... 11
+6 Referencias ..................................................................................................................................................... 12
+7 Anexos............................................................................................................................................................ 12
+   7.1 Resumen para la matriz consolidada ........................................................................................................ 12
+
+                                                                   3
+Resumen ejecutivo
+
+El módulo Desembolso identifica el Servicio de Gestión del Desembolso de Créditos, propuesto como SRV-
+CR-04. El servicio recibe la habilitación de un crédito aprobado, gestiona la orden, valida las condiciones de
+ejecución y solicita a Cuentas el abono. Una vez confirmado el resultado financiero, conserva su evidencia y
+comunica a Cobranza la información necesaria para continuar el ciclo del crédito.
+
+El escenario base es el desembolso total gestionado en agencia, a una cuenta individual habilitada del titular y
+en la misma moneda del crédito. El informe documenta consumidores, entradas, salidas, valor, responsables,
+dependencias y tecnología habilitadora. Las relaciones consideradas son CR-INT-04, CR-INT-05, CR-INT-06
+y CR-INT-10; los contratos técnicos y las decisiones pendientes se mantienen sujetos a coordinación.
+
+Tabla 3
+Objetivos y criterios de verificación de la actividad I-01
+
+           Objetivo                              Criterio verificable                       Evidencia
+Identificar el servicio                                                             Sección 2
+                           Un servicio principal con nombre, código, descripción y
+                           responsable.
+
+Explicar el valor          Beneficios concretos para el cliente y para el BNA.      Secciones 2.5 y 2.6
+Respetar las dependencias  Relaciones vinculadas a la matriz CR-INT vigente.        Sección 2.7
+
+Registrar los pendientes   Decisiones no ratificadas diferenciadas del alcance base. Sección 2.9
+
+1 Alcance de la actividad I-01
+
+I-01 identifica los servicios de TI que presta cada módulo y el valor que generan, tomando como base el trabajo
+de arquitectura de Fase I. La ficha constituye el insumo inicial del catálogo de servicios de Créditos.
+
+1.1 Entregable y límites de la actividad
+
+Se entrega una ficha de servicio principal con sus nueve apartados y una síntesis para consolidación. Los SLA
+definitivos, flujos completos de incidentes y cambios, políticas de continuidad y endpoints finales corresponden
+a actividades posteriores. Las ampliaciones de alcance se coordinan antes de incorporarse al servicio.
+
+1.2 Criterio para identificar el servicio
+
+La preparación de la orden, las validaciones, la confirmación del abono, la consulta de estado y la trazabilidad
+contribuyen al mismo resultado para el cliente. Por ello se agrupan en un solo servicio. La reversión conserva
+su carácter de decisión pendiente y no se declara como un servicio independiente aprobado.
+
+                           4
+2 Ficha de identificación del servicio SRV-CR-04
+
+La caracterización conserva los nueve apartados de la plantilla común y los desarrolla con el formato de
+informe de la Línea de Créditos.
+
+Tabla 4
+Datos generales del servicio
+
+          Campo                                         Contenido
+
+Módulo                        Desembolso (DES)
+
+Líder del módulo              Reaño Soto, Iván Edgardo
+
+Enlace del Comité de Créditos Sebastián Conde, referente de coordinación; designación por ratificar.
+
+Código del servicio           SRV-CR-04, propuesto para la codificación uniforme.
+
+Nombre del servicio           Servicio de Gestión del Desembolso de Créditos
+
+Responsable funcional         Iván Edgardo Reaño Soto, líder del módulo; responsabilidad del servicio a
+                              ratificar en I-05.
+
+2.1 Descripción del servicio
+
+Gestiona la orden de desembolso de un crédito aprobado, valida sus condiciones y la cuenta destino, solicita y
+confirma el abono con Cuentas, conserva la evidencia de la operación y comunica a Cobranza el desembolso
+confirmado para habilitar la obligación de cobro.
+
+Se parte de una aprobación válida y de una cuenta habilitada del titular. El servicio coordina la ejecución con el
+módulo propietario de la cuenta y conserva referencias verificables del resultado. La entrega de información a
+Cobranza se gestiona de manera diferenciada del estado financiero del desembolso.
+
+2.2 Consumidores
+
+Tabla 5
+Consumidores del servicio
+
+Consumidor                    Qué utiliza o recibe                                  Referencia
+
+Cliente con crédito        Recibe el monto autorizado en su cuenta y la constancia  Escenario base
+aprobado                   del resultado.
+
+Personal autorizado del    Gestiona la orden en agencia, revisa las validaciones y  Ejecutar Desembolso
+BNA                        consulta el estado.
+
+Cobranza                   Recibe información del desembolso confirmado para        CR-INT-06
+                           continuar el ciclo del crédito.
+
+                              5
+2.3 Entrada principal
+
+La entrada habilitante procede de Evaluación. Los datos adicionales permiten vincular la orden con el crédito
+aprobado, la cuenta destino y el usuario autorizado.
+
+Tabla 6
+Entradas y condiciones previas del servicio
+
+Entrada o condición                          Contenido                           Origen o referencia
+
+Crédito aprobado        Referencias de solicitud, aprobación y cliente; monto,   Evaluación, CR-INT-04
+                        moneda y condiciones autorizadas; evidencia de
+                        vigencia.
+
+Orden de desembolso     Referencia del crédito, cuenta destino, monto total      Personal autorizado en
+                        autorizado e identificación del usuario que solicita la  agencia
+                        operación.
+
+Cuenta habilitada       Existencia, titularidad individual, estado habilitado y  Cuentas, CR-INT-05
+                        coincidencia de moneda. El detalle de validación se
+                        cierra en el contrato.
+
+Control y trazabilidad  Actor autorizado, referencias de operación y             Diseño del módulo y
+                        correlación, marcas de tiempo y clave de idempotencia.   contratos pendientes
+                        La unicidad se ratifica con Tecnología.
+
+Los nombres definitivos de los campos y los contratos de validación se acuerdan con las contrapartes.
+Desembolso conserva las referencias necesarias y no asume la propiedad de la aprobación ni de los datos
+maestros de cuenta.
+
+2.4 Salida y resultado
+
+Tabla 7
+Resultados del servicio
+
+Salida                   Resultado esperado                                      Destino o referencia
+
+Desembolso confirmado   Orden con monto, moneda, fecha y evidencia del abono;    Cliente y personal
+                        referencia de la operación financiera y constancia       autorizado; CR-INT-05
+                        consultable.
+
+Información para        Crédito, monto, fecha y referencia del desembolso
+Cobranza                confirmado. Activación y calendario sujetos al acuerdo Cobranza, CR-INT-06
+                        entre módulos.
+
+Rechazo o resultado     Motivo de rechazo si falla una validación; estado        Personal autorizado y
+pendiente               pendiente de comprobación si no se conoce el resultado   consulta de estado
+                        financiero.
+
+Eventos críticos        Actor, operación, validaciones, resultado y correlación Seguridad/Auditoría,
+
+                        para la trazabilidad del servicio.                       CR-INT-10
+
+Una falla al notificar a Cobranza no revierte por sí misma un abono correcto. Ante incertidumbre financiera se
+debe comprobar el resultado antes de reintentar; la regla técnica final se mantiene en los pendientes de
+integración.
+
+                                             6
+2.5 Valor para el cliente
+
+El servicio convierte la aprobación del crédito en disponibilidad de fondos para su titular. Los beneficios se
+relacionan con el resultado recibido y con los controles que protegen la operación.
+
+Tabla 8
+Valor generado para el cliente
+
+           Beneficio                          Cómo se concreta en el servicio
+
+Disponibilidad del monto        El cliente recibe el monto autorizado en la cuenta habilitada que le
+aprobado                        corresponde, bajo las condiciones de la aprobación.
+
+Resultado consultable           La constancia y la consulta de estado permiten conocer si el desembolso se
+                                completó, fue rechazado o requiere comprobación.
+
+Protección frente a errores de La validación de titularidad, estado y moneda busca evitar abonos a una
+
+destino                         cuenta incorrecta o no habilitada.
+
+Protección frente a duplicidad  La vinculación de la orden con la aprobación y los controles de
+                                idempotencia buscan evitar un segundo desembolso ante reintentos.
+
+2.6 Valor para el BNA
+
+El banco necesita mantener una relación verificable entre la decisión crediticia, la orden de desembolso y el
+resultado financiero. Esa relación también permite continuar el proceso con Cobranza y atender consultas
+operativas.
+
+Tabla 9
+Valor generado para el BNA
+
+Tipo de valor             Beneficio                                 Cómo se concreta
+
+Operativo      Continuidad del ciclo de       Se comunica a Cobranza el desembolso confirmado
+Control        crédito                        mediante CR-INT-06.
+Control
+               Desembolso vinculado a una     La orden conserva las referencias del crédito aprobado, del
+               aprobación                     actor y de la operación financiera.
+
+               Prevención de duplicidad       La ejecución y sus reintentos se vinculan mediante la regla
+                                              de idempotencia que se acuerde.
+
+Trazabilidad   Evidencia para conciliación y  Se registran validaciones, resultado y eventos críticos con
+Arquitectura   auditoría                      correlación.
+
+               Responsabilidades separadas    El servicio consume APIs de los propietarios de los datos
+                                              y no modifica tablas ajenas.
+
+Estos beneficios expresan el valor esperado del servicio. Su verificación operativa requerirá las pruebas de
+integración de Fase II y el cierre de las decisiones técnicas pendientes.
+
+                                              7
+2.7 Dependencias
+
+Las dependencias se limitan a las relaciones necesarias para prestar el servicio que figuran en la matriz CR-
+INT. La relación funcional está identificada; sus contratos técnicos no se consideran automáticamente cerrados.
+
+Tabla 10
+Dependencias directas del servicio
+
+CR-INT          Emisor              Receptor              Finalidad y aspecto por cerrar
+
+CR-INT-04 Evaluación    Desembolso                  Habilitar el crédito aprobado. Precisar la evidencia
+                                                    de vigencia y las condiciones de la autorización.
+
+CR-INT-05 Desembolso    Cuentas                     Solicitar y confirmar el abono. Acordar validación
+                                                    de cuenta, ejecutor financiero y evidencia del
+                                                    resultado.
+
+CR-INT-06 Desembolso    Cobranza                    Comunicar el desembolso confirmado para activar
+                                                    la obligación. Cerrar entrega, activación y
+                                                    calendario.
+
+CR-INT-10  Créditos /   Seguridad y                 Registrar eventos críticos y trazabilidad. Cerrar
+           Desembolso   Auditoría                   permisos y contrato transversal.
+
+Las APIs se integran mediante el Bus de Servicios previsto en el diseño. El Bus es un mecanismo técnico de
+integración; no se utiliza para introducir una dependencia funcional adicional sin coordinación con Créditos.
+
+Tabla 11
+Relaciones que no se incorporan como dependencia directa
+
+Módulo o canal          Tratamiento                       Motivo
+
+CORE                                                              El ejecutor del movimiento y del asiento se
+                  Sin nueva conexión directa declarada. debe precisar dentro de la coordinación de CR-
+
+                                                                  INT-05.
+
+Clientes          Sin acceso directo a sus datos    Se usan referencias de identidad; la validación
+Solicitud         maestros.                         y el contrato correspondiente deben conciliarse
+                                                    con la matriz.
+                  Sin dependencia directa añadida.
+                                                    El calendario requiere coordinación de
+                                                    responsabilidades, sin crear una conexión
+                                                    nueva por esa sola consulta.
+
+Home Banking y    Fuera del escenario base.         El desembolso considerado se gestiona en
+Tarjetas                                            agencia. Una ampliación de canal requiere
+                                                    acuerdo previo.
+
+Las referencias IF-01 a IF-07 utilizadas en el diseño histórico se deben conciliar con las CR-INT. Esta ficha no
+establece equivalencias individuales que aún no hayan sido verificadas por las contrapartes.
+
+                                              8
+2.8 Tecnología habilitadora
+
+La base técnica común de la Línea de Créditos es Python, FastAPI y MySQL. En I-01 se identifica cómo
+habilita el servicio; la especificación completa se desarrolla posteriormente.
+
+Tabla 12
+Tecnología habilitadora de Desembolso
+
+       Componente                         Rol en el servicio
+
+Python y FastAPI   Lógica del servicio, validaciones propias y coordinación de la orden de
+                   desembolso.
+
+MySQL              Persistencia de los datos propios: orden, validaciones, referencias de
+                   operación, entrega y trazabilidad.
+
+Servicios/API      Intercambio con los módulos contraparte, conforme a TOGAF y CR-INT y
+                   con el encaminamiento por el Bus previsto en el diseño.
+
+OpenAPI / Swagger  Documentación de las APIs generada por FastAPI; los contratos definitivos
+                   se acuerdan con Tecnología.
+
+Ambientes          Desarrollo, Testing y Producción previstos. Las evidencias de integración se
+                   consolidan en Testing.
+
+Cada módulo mantiene su lógica de negocio y sus datos. Desembolso no consulta ni modifica directamente
+tablas de otros módulos. Las condiciones de seguridad, error, timeout y despliegue requieren coordinación con
+Tecnología e Infraestructura.
+
+Criterios técnicos que conserva el servicio
+
+La orden mantiene referencias a la aprobación, al cliente, a la cuenta y al resultado financiero. La trazabilidad
+permite relacionar esos elementos con el actor y la operación. La idempotencia y la consulta del resultado
+buscan evitar que un reintento origine otro movimiento de fondos.
+
+El estado de entrega a Cobranza se conserva separado del estado financiero. La confirmación del abono y la
+confirmación de recepción por Cobranza representan resultados distintos que deben poder comprobarse por
+separado.
+
+La ficha no fija endpoints finales, tablas físicas, modelos Pydantic, scripts SQL ni configuraciones de
+despliegue. Tampoco acredita pruebas contra servicios reales; esas evidencias corresponden al trabajo posterior
+de Fase II.
+
+                                       9
+2.9 Observaciones y pendientes
+
+Las decisiones aún no ratificadas se mantienen abiertas. El líder del módulo, Iván Edgardo Reaño Soto,
+coordina su seguimiento con el Comité de Créditos y las instancias que correspondan.
+
+Tabla 13
+Decisiones pendientes del servicio
+
+       ID y tema                      Decisión o coordinación requerida                         Instancias
+OBS-DES-01                                                                              Comité de Créditos
+Identificación        Ratificar SRV-CR-04, el servicio principal, la responsabilidad
+                      funcional en el catálogo y la designación del enlace. El          Seguridad, Tecnología y
+OBS-DES-02            liderazgo corresponde a Iván Edgardo Reaño Soto.                  Bus
+Permisos
+                      Precisar si LIDER_DESEMBOLSO, con                                 Cuentas, Bus y
+OBS-DES-03            DESEMBOLSO_LEER y DESEMBOLSO_EJECUTAR,                            Tecnología
+Ejecución financiera  puede consumir validaciones de Cuentas y Evaluación o
+                      necesita autorizaciones adicionales.
+
+                      Confirmar quién ejecuta el abono y el asiento dentro de CR-
+                      INT-05 y cómo devuelve una confirmación consistente, sin
+                      acceso del módulo a tablas financieras ajenas.
+
+OBS-DES-04            Ratificar la clave técnica, la unicidad por crédito o aprobación  Cuentas y Tecnología
+Idempotencia          y la consulta de resultado antes de reintentar. Un timeout no
+                      prueba que el abono no ocurrió.
+
+OBS-DES-05            Acordar quién activa el crédito, calcula y mantiene el            Créditos, Cobranza,
+Activación y          calendario y qué se entrega por CR-INT-06. Cobranza atribuye      Solicitud y Tecnología
+calendario            su entrega a Desembolso; la referencia común mantiene
+                      pendiente la propiedad del calendario.
+
+OBS-DES-06            Definir entrega durable a Cobranza, confirmación de recepción Desembolso, Cobranza
+Entrega
+                      y reintentos; separar estado de entrega y estado financiero.      y Tecnología
+
+OBS-DES-07            Aprobar causales, autoridad y límites del extorno, distinguirlo   Créditos, Cuentas y
+Reversión             de la compensación técnica y definir después su tratamiento en    Tecnología
+                      ITIL.
+OBS-DES-08                                                                              Créditos, Tecnología,
+Contratos             Conciliar IF-01 a IF-07 con CR-INT; cerrar referencias de         Seguridad y
+                      identidad sin biometría local, estados, errores, timeouts,        contrapartes
+OBS-DES-09            auditoría y detalle de persistencia.
+Ampliaciones                                                                            Comité de Créditos
+                      Conservar fuera del escenario base desembolsos parciales,
+                      conversión de moneda, cuentas mancomunadas, comisiones,
+                      impuestos, doble autorización y Home Banking. Toda
+                      ampliación requiere coordinación.
+
+La matriz de permisos sobre tablas no permite deducir por sí sola la autorización efectiva de una API. Por ello, la
+consulta de permisos se mantiene como una definición por resolver y no como un fallo de integración ya
+demostrado.
+
+                                    10
+3 Validación contra TOGAF y la matriz CR-INT
+
+La revisión se centra en la consistencia documental de la ficha. Se distinguen los elementos del diseño del
+módulo, las relaciones de la matriz y las decisiones técnicas que aún requieren acuerdo.
+
+Tabla 14
+Trazabilidad de la ficha
+
+         Elemento                Base utilizada                Tratamiento en el informe
+Servicio y alcance
+Dependencias              Antecedentes del módulo y plantilla  Un servicio principal; desembolso total en
+Tecnología                de I-01.                             agencia a cuenta individual y en la misma
+Calendario y activación                                        moneda.
+Permisos y ejecución
+                          Referencia TOGAF y matriz CR-        CR-INT-04, 05, 06 y 10; sin nuevas conexiones
+                          INT.                                 directas.
+
+                          Lineamiento técnico común.           Python, FastAPI y MySQL, con integración
+                                                               mediante API.
+
+                          Referencia común y ficha de          La diferencia entre fuentes se conserva como
+                          Cobranza.                            OBS-DES-05.
+
+                          Consulta técnica registrada en el chat Se mantienen pendientes hasta la respuesta de
+
+                          del módulo.                          las instancias competentes.
+
+4 Plan de trabajo y siguientes pasos
+
+La guía común fija el inicio de Fase II el 28/09/2026. La ficha de Desembolso alimenta las actividades
+posteriores sin anticipar sus resultados.
+
+Tabla 15
+Actividades de Fase II relacionadas con el servicio
+
+ Actividad    Fechas de la guía                                Aporte o siguiente paso
+I-01        28/09 al 04/10       Consolidar el servicio, su codificación y los pendientes. Control interno
+I-03        05/10 al 12/10       previsto: 02/10.
+I-04        09/10 al 16/10       Modelar el flujo de valor de Desembolso y Cobranza.
+I-05        13/10 al 20/10       Definir las prácticas ITIL aplicables, incluido el tratamiento de la reversión.
+I-06        18/10 al 25/10       Definir catálogo, responsables y niveles de servicio con dependencias
+                                 ratificadas.
+                                 Consolidar pruebas, integración, evidencias en Testing y documentación.
+
+5 Conclusiones
+
+Desembolso presta un servicio principal que vincula la aprobación crediticia con el abono confirmado y la
+continuidad hacia Cobranza. Sus consumidores y beneficios quedan identificados, con Iván Edgardo Reaño
+Soto como líder del módulo.
+
+Las cuatro dependencias respetan la matriz CR-INT. El cierre de permisos, ejecución financiera, idempotencia,
+entrega y calendario es necesario para precisar los contratos y sustentar posteriormente los niveles de servicio y
+las pruebas de integración.
+
+                                                       11
+6 Referencias
+
+Comité de Créditos BNA. (2026). Guía de Inicio de Fase II ITIL 4, Línea de Créditos BNA.
+
+Comité de Créditos BNA. (2026). Plantilla de Ficha de Identificación de Servicio TI, actividad I-01.
+
+Comité de Créditos BNA. (2026). Referencia de Dependencias TOGAF y Matriz CR-INT.
+
+Comité de Créditos BNA. (2026). Lineamiento Técnico Común de la Línea de Créditos: Python, FastAPI y
+MySQL.
+
+Módulo de Cobranza. (2026). Ficha de Identificación de Servicio TI SRV-CR-05. 8 de octubre.
+
+Módulo de Solicitud de Crédito. (2026). Servicios de TI y valor generado del módulo Solicitud de Crédito,
+actividad I-01. 4 de octubre.
+
+Módulo de Desembolso. (2026). Antecedentes de coordinación y consulta de permisos recopilados en la
+conversación «Acta de reunión módulo de desembolso».
+
+7 Anexos
+
+7.1 Resumen para la matriz consolidada
+
+Tabla 16
+Resumen del servicio SRV-CR-04
+
+           Campo                                               Contenido
+Código y nombre   SRV-CR-04 (propuesto). Servicio de Gestión del Desembolso de Créditos.
+
+Módulo y líder    Desembolso. Iván Edgardo Reaño Soto.
+
+Descripción       Gestiona la orden de un crédito aprobado, solicita y confirma el abono con Cuentas y
+                  comunica el resultado a Cobranza.
+
+Consumidores      Cliente con crédito aprobado, personal autorizado en agencia y Cobranza.
+Entrada
+                  Habilitación de Evaluación; referencias del crédito y la cuenta; monto y moneda
+                  autorizados; trazabilidad.
+
+Salida            Resultado del desembolso, constancia, referencia financiera e información para
+                  Cobranza.
+
+Valor             Disponibilidad del monto autorizado y resultado consultable para el cliente; control y
+Dependencias      trazabilidad para el BNA.
+
+                  Evaluación, Cuentas, Cobranza y Seguridad/Auditoría. CR-INT-04, 05, 06 y 10.
+
+Tecnología        Python, FastAPI, MySQL e integración mediante API.
+
+Pendientes        Permisos, ejecución financiera, idempotencia, entrega, activación, calendario y
+                  reversión.
+
+                                        12
+

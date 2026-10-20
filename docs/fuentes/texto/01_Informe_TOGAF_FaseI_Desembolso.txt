@@ -1,0 +1,1153 @@
+p
+
+                    UNIVERSIDAD CATÓLICA DE SANTA MARÍA
+
+                    ESCUELA PROFESIONAL DE INGENIERÍA DE SISTEMAS
+
+            GESTIÓN DE SISTEMAS Y TECNOLOGÍAS DE LA INFORMACIÓN - A
+
+TRABAJO GRUPAL INTEGRADOR, FASE I (TOGAF 10): MÓDULO 13 DESEMBOLSO, LÍNEA DE
+                                                  CRÉDITOS
+
+  CÓDIGO                           APELLIDOS Y NOMBRES                  FECHA
+2023600951  Centeno Lopez, Jose Alfredo                              09/09/2026
+2023223181  Lazo Franco, Mauricio Paolo                              09/09/2026
+2023223991  Nuñez Arista, Piero Bruker                               09/09/2026
+2023224941  Reaño Soto, Iván Edgardo                                 09/09/2026
+2023225471  Sucapuca Santamarina, Rodrigo Alonso                     09/09/2026
+
+1. INTRODUCCIÓN Y BASE DEL DOCUMENTO
+
+    El módulo de Desembolso convierte un crédito aprobado en un abono a una cuenta del
+    cliente, previa validación de su identidad. El presente informe establece la arquitectura
+    objetivo específica de Desembolso para la Fase I del proyecto Banco Nacional de
+    Arequipa (BNA), bajo el marco TOGAF 10. Incluye alcance, interesados, reglas de negocio,
+    requerimientos, arquitectura de negocio, datos, aplicaciones y tecnología, interfaces,
+    diagramas, estándares y plan de trabajo.
+
+    La arquitectura general del BNA presenta cuatro capas: canales; gobierno e integración;
+    negocio; y núcleo CORE con persistencia relacional ACID. Desembolso es el módulo 13 y
+    pertenece a la Línea de Créditos de la capa de negocio. El Bus de Servicios conecta los
+    módulos con las capacidades centrales del CORE y con Seguridad.
+
+    Esta versión del informe incorpora los acuerdos comunicados por el Comité de Créditos
+    para la Fase I. En particular, se adopta la estructura uniforme de requerimientos
+    funcionales y casos de uso exigida por la línea, se explicita la posición del módulo dentro
+    del flujo Captación de Clientes, Solicitud de Crédito, Evaluación, Desembolso y Cobranza,
+    y se reconocen las dependencias ya registradas en la Matriz de Dependencias e
+    Intercambio de Datos. El equipo mantiene la responsabilidad del diseño interno de su
+    módulo; el Comité de Créditos coordina y revisa la arquitectura funcional de la línea.
+
+    Los documentos de referencia de la línea son el Diccionario de Reglas de Negocio, la
+    Matriz de Dependencias e Intercambio de Datos y la Plantilla Estándar de Requerimientos
+    y Casos de Uso. Las reglas contenidas en el Diccionario de Ahorros se consideran
+    aplicables únicamente donde exista interacción efectiva con esos módulos y no se
+    asumen como reglas propias de Créditos.
+
+    La solución se presenta como arquitectura objetivo propuesta. Las decisiones sujetas a
+    coordinación intermodular se identifican en el registro de acuerdos y en el registro de
+    propuestas de cambio, sin atribuirles una aprobación previa. Las fuentes documentales
+    se consignan al final del informe.
+2. ALCANCE Y LÍMITES
+
+    Alcance mínimo derivado del caso.
+
+     • Desembolsar un préstamo a alguna de las cuentas del cliente.
+     • Validar al cliente antes de la ejecución.
+     • Integrarse con los módulos y servicios de la arquitectura general del BNA.
+    Alcance de diseño propuesto.
+
+     • Recibir o consultar la aprobación del crédito y conservar su referencia y versión.
+     • Consultar la identidad del cliente y la elegibilidad de la cuenta destino.
+     • Preparar una orden, mostrar su resumen y solicitar su confirmación.
+     • Solicitar al CORE, mediante el Bus de Servicios, el registro financiero del desembolso.
+     • Consultar el resultado sin repetir el movimiento ante reintentos o pérdida de
+
+         respuesta.
+     • Registrar el estado, la evidencia de validación y la trazabilidad de la operación.
+     • Comunicar a Cobranza el desembolso confirmado y la fecha efectiva.
+     • Mostrar una constancia y permitir consultas de estado e historial.
+     • Diseñar la conciliación y las solicitudes de reversión, cuya política queda pendiente.
+    Como escenario base de diseño se propone el desembolso total en agencia a una cuenta
+    de ahorros individual habilitada del titular, en la misma moneda del crédito. Esta elección
+    acota el prototipo y es coherente con la dependencia entre Desembolso y Cuentas ya
+    reconocida en la matriz transversal; no se presenta como una restricción impuesta por el
+    caso.
+
+    Responsabilidades externas y ampliaciones.
+
+    Evaluación conserva la decisión de aprobación; Solicitud de Crédito conserva las
+    condiciones solicitadas y acordadas del crédito; Captación de Clientes provee la
+    identificación y la situación financiera que originan el expediente; Clientes realiza la
+    validación de identidad y mantiene sus datos funcionales; Cuentas informa titularidad,
+    estado y elegibilidad de la cuenta destino; CORE es la autoridad de los registros
+    financieros y contables; Seguridad autentica, autoriza y aplica controles antifraude;
+    Cobranza gestiona el cobro de cuotas. Debe acordarse cómo se distribuyen los datos de
+    Clientes respecto del maestro central del CORE.
+
+    Desembolsos parciales, conversión de moneda, cuentas mancomunadas, comisiones,
+    impuestos, doble autorización y desembolso por Home Banking permanecen como
+    ampliaciones funcionales pendientes de aprobación. El uso de Home Banking previsto
+    por la línea corresponde al pago de cuotas y se atiende en Cobranza, no en Desembolso.
+    No se adoptan automáticamente los plazos de treinta días de vigencia de la aprobación
+    ni de quince días para una nueva consulta de riesgos, por corresponder a reglas cuya
+    propiedad debe confirmarse con Evaluación en el Diccionario de Reglas de Negocio de la
+    Línea de Créditos. Tampoco se asigna a Desembolso la potestad de anular una
+    aprobación de Evaluación.
+
+3. POSICIÓN DEL MÓDULO EN LA LÍNEA DE CRÉDITOS
+
+    La Línea de Créditos opera como un proceso integrado con la secuencia Captación de
+    Clientes, Solicitud de Crédito, Evaluación, Desembolso y Cobranza. Desembolso es el
+    cuarto eslabón: recibe una decisión ya tomada por Evaluación y entrega a Cobranza un
+crédito efectivamente desembolsado. El módulo no reabre decisiones anteriores ni
+administra el cobro posterior.
+
+Relación             Módulo                        Información que se intercambia
+
+Antecedente          10. Captación de          Identificación del cliente y situación financiera que
+indirecto            Clientes                  originan el expediente. Desembolso no consume
+                                               estos datos de forma directa.
+
+Antecedente          11. Solicitud de Crédito  Condiciones aprobadas del crédito: monto, moneda,
+                                               plazo, calendario y garantías, con su versión.
+
+Entrada directa      12. Evaluación            Resultado de la aprobación, su vigencia y su versión.
+                                               Sin aprobación habilitada no se ejecuta.
+
+                                               Desembolso confirmado, identificador de la
+
+Salida directa       14. Cobranza              operación financiera, importe, moneda, fecha
+
+                                               efectiva y versión de condiciones.
+
+                Tabla 1. Posición de Desembolso en el flujo de la Línea de Créditos.
+
+Además del flujo interno de la línea, el módulo mantiene dependencias con módulos de
+otras áreas del banco. La Matriz de Dependencias e Intercambio de Datos ya reconoce la
+integración entre Desembolso y Cuentas para depositar un crédito aprobado en la cuenta
+de ahorros del cliente, y entre Cobranza y Cuentas para el pago de cuotas. Sobre esa
+misma matriz se establece como criterio general que las comunicaciones entre
+aplicaciones, canales y CORE se gestionen mediante el Bus de Servicios con APIs REST y
+JSON, sujeto a los acuerdos definitivos de arquitectura.
+
+Módulo externo a                     Necesidad de Desembolso                          Estado
+      la línea
+
+Cuentas              Elegibilidad, titularidad, estado y moneda de la        Reconocida en la
+                     cuenta destino; abono del crédito aprobado.             matriz
+
+Clientes             Validación de identidad del titular antes de ejecutar.  Reconocida en la
+                                                                             matriz
+
+CORE                 Registro financiero y contable del desembolso y de      Reconocida en la
+                     una eventual reversión.                                 matriz
+
+Bus de Servicios     Transporte, enrutamiento y versionado de los            Criterio general de la
+                     contratos REST y JSON.                                  matriz
+
+Seguridad            Autenticación del consumidor, autorización sobre la     Por coordinar
+                     operación y controles antifraude.
+
+Home Banking         Pago de cuotas de créditos otorgados por la línea. No Fuera del alcance del
+
+                     interviene en el desembolso.                            módulo
+
+          Tabla 2. Dependencias de Desembolso con módulos de otras áreas del BNA.
+
+La coordinación con el Comité de Créditos se realiza a través del enlace asignado al
+módulo 13, el señor Sebastián Conde. Toda dependencia nueva o modificación de las
+existentes se comunica por ese canal antes de incorporarse al diseño, conforme a la
+sección de propuestas de cambio del presente informe.
+
+4. INTERESADOS Y RESPONSABILIDADES
+
+         Interesado                             Necesidad o responsabilidad
+Cliente titular      Recibir el importe correcto en una cuenta autorizada y conocer el
+Operador de agencia  resultado.
+Supervisor           Consultar créditos, validar datos, confirmar y consultar la operación.
+Líder y equipo de    Revisar excepciones y autorizar operaciones cuando la política aprobada
+Desembolso           lo requiera.
+
+                     Diseñar, documentar e implementar el módulo y sus contratos.
+         Interesado                                Necesidad o responsabilidad
+
+                              Coordinar y revisar la arquitectura funcional de la línea, sus
+
+Comité de Créditos            dependencias y sus reglas comunes. Enlace asignado al módulo 13:
+
+                              Sebastián Conde.
+
+Comité de Tecnología          Aprobar arquitectura, interoperabilidad y estándares comunes del BNA.
+
+Evaluación y Solicitud de Acordar y proveer la aprobación, las condiciones del crédito y sus
+
+Crédito                       versiones.
+
+Clientes y Cuentas            Acordar y proveer las validaciones de identidad y la elegibilidad de la
+                              cuenta destino.
+
+CORE, Bus y Seguridad         Acordar la ejecución financiera, la integración y la protección de los
+                              servicios.
+
+Cobranza                      Acordar la recepción del desembolso y el tratamiento del calendario de
+                              pagos.
+
+Calidad                       Revisar la consistencia del diseño y los criterios de aceptación.
+
+Infraestructura               Definir plataforma, ambientes, monitoreo, respaldo y recuperación.
+
+Comité PMI                    Coordinar actividades, dependencias, responsables y fechas.
+
+                        Tabla 3. Interesados del módulo de Desembolso.
+
+5. PRINCIPIOS DE ARQUITECTURA PROPUESTOS
+
+La aplicación de TOGAF se organiza mediante artefactos concretos. La Fase Preliminar
+establece principios; la Fase A delimita la visión y los interesados; la Fase B describe
+procesos y reglas; la Fase C define datos y aplicaciones; y la Fase D establece la plataforma
+y los ambientes. La gestión de requerimientos vincula estas vistas durante todo el diseño.
+El plan de trabajo constituye una planificación académica de consolidación y no afirma
+completar todo el ciclo ADM.
+
+   ID            Principio                         Aplicación
+PA-01
+PA-02     Integridad financiera  El movimiento y su asiento se confirman juntos bajo responsabilidad
+PA-03                            del CORE.
+PA-04
+PA-05     Idempotencia           Una misma solicitud no produce un segundo desembolso.
+PA-06
+PA-07     Trazabilidad           Se relacionan orden, operación CORE, validaciones y entrega a
+PA-08                            Cobranza.
+
+          Propiedad de datos     Cada servicio accede a datos externos mediante contratos, sin
+                                 modificar tablas ajenas.
+
+          Integración común      Las llamadas de integración se encaminan por el Bus con APIs REST y
+                                 JSON, según el criterio general de la matriz.
+
+          Decisiones             Se vinculan las decisiones con requerimientos y, cuando existan, con
+
+          justificadas           actas de comité.
+
+          Seguridad por diseño   Se comprueban identidad, autorización y reglas de acceso antes de
+                                 ejecutar.
+
+          Compatibilidad de      Ningún diseño interno del módulo contradice los acuerdos de la
+
+          línea                  Línea de Créditos ni la matriz transversal.
+
+                        Tabla 4. Principios de arquitectura del módulo.
+
+6. REGLAS DE NEGOCIO DEL MÓDULO
+
+Las reglas se codifican para poder referenciarlas desde los requerimientos funcionales,
+conforme a la estructura uniforme acordada por la línea. La columna de origen distingue
+las reglas propias del módulo, las que provienen de un acuerdo de la Línea de Créditos y
+las que provienen del Diccionario de Ahorros y solo resultan aplicables por interacción
+con Cuentas o Clientes.
+
+   ID                            Regla de negocio                        Origen          Estado
+RN-01     La decisión de aprobación pertenece a Evaluación.        Acuerdo de línea  Vigente
+          Desembolso verifica su habilitación antes de ejecutar y
+          no la modifica.
+   ID                   Regla de negocio                          Origen                  Estado
+RN-02                                                                                 Vigente
+RN-03  Debe existir validación satisfactoria del cliente y        Propia              Por confirmar
+RN-04  autorización del operador antes de ejecutar.                                   Vigente
+
+RN-05  La cuenta destino debe cumplir titularidad, estado y Ahorros por               Vigente
+
+RN-06  restricciones informadas por Cuentas.                      interacción         Vigente
+RN-07                                                                                 Vigente
+RN-08  En el escenario base, importe y moneda corresponden                            Por confirmar
+RN-09                                                                                 Por confirmar
+RN-10  al crédito aprobado. No se efectúan conversiones ni Propia                     Vigente
+
+       descuentos sin una regla aprobada.
+
+       Solo puede confirmarse un desembolso total por
+
+       aprobación o crédito, según la clave de negocio            Propia
+       acordada. Una nueva clave técnica no permite eludir
+
+       este control.
+
+       La elegibilidad y los límites se revalidan en la frontera
+
+       de ejecución para no operar sobre información              Propia
+
+       desactualizada.
+
+       Un tiempo de espera agotado no prueba que la
+
+       operación haya fallado. Se consulta el resultado antes Propia
+
+       de tomar otra acción.
+
+       Una falla de entrega a Cobranza no convierte un
+
+       desembolso confirmado en rechazado. Se mantiene Acuerdo de línea
+
+       una entrega pendiente y se reintenta.
+
+       Una reversión es otra operación financiera
+
+       referenciada y auditable. No borra el desembolso           Propia
+
+       original.
+
+       El abono se realiza sobre una cuenta de ahorros del
+
+       cliente administrada por Cuentas, según la                 Matriz transversal
+
+       dependencia registrada en la matriz transversal.
+
+       Tabla 5. Reglas de negocio asociadas al módulo de Desembolso.
+
+7. REQUERIMIENTOS FUNCIONALES
+
+Los requerimientos se documentan con la estructura uniforme solicitada por el Comité
+de Créditos. La primera tabla consigna código, requerimiento, módulo responsable,
+prioridad y regla de negocio asociada; la segunda consigna entradas, salidas y criterio de
+aceptación del mismo código, para mantener la legibilidad del documento.
+
+   ID       Requerimiento funcional           Módulo              Prioridad        Regla asociada
+RF-01                                       responsable           Alta       RN-01
+RF-02  Obtener una aprobación              13.                    Alta       RN-02
+RF-03  habilitada para desembolso.         Desembolso             Alta       RN-03, RN-10
+RF-04  Validar la identidad del cliente    13.                    Alta       RN-04, RN-06
+RF-05  titular.                            Desembolso             Alta       RN-04
+RF-06  Consultar y validar la cuenta       13.                    Alta       RN-05, RN-07
+RF-07  destino.                            Desembolso             Alta       RN-08
+RF-08  Preparar y confirmar la orden de    13.                    Media      RN-07
+RF-09  desembolso.                         Desembolso             Media      RN-05, RN-08
+RF-10  Ejecutar el desembolso mediante     13.                    Baja       RN-09
+       el Bus y el CORE.                   Desembolso
+       Evitar duplicados y consultar       13.
+       operaciones inciertas.              Desembolso
+       Comunicar el resultado del          13.
+       desembolso a Cobranza.              Desembolso
+       Consultar estado, historial y       13.
+       constancia de la operación.         Desembolso
+       Registrar y conciliar las           13.
+       operaciones ejecutadas.             Desembolso
+       Solicitar la reversión conforme a   13.
+       una política aprobada.              Desembolso
+       Tabla 6. Requerimientos funcionales, responsable, prioridad y regla asociada.
+
+ID     Entradas                                   Salidas           Criterio de aceptación
+
+RF-01  Identificador de crédito o      Aprobación habilitada con    Una aprobación rechazada,
+       de cliente.                     su versión y vigencia.       revocada o vencida según
+                                                                    Evaluación impide ejecutar.
+
+          Identificador del cliente y  Referencia de validación y   La orden conserva una
+RF-02 desafío o evidencia de           su resultado.                referencia de validación
+                                                                    satisfactoria asociada al titular.
+          identidad.
+
+                                                                    Solo se permite continuar con
+
+RF-03  Identificador de cliente, de    Titularidad, estado, moneda una cuenta de ahorros del
+       cuenta y moneda.                y restricciones de la cuenta. cliente habilitada según
+
+                                                                    Cuentas.
+
+       Crédito, cuenta destino,        Orden persistida en estado Se muestra crédito, cuenta,
+
+RF-04 importe, moneda y usuario validado y clave de                 moneda e importe, y se registra
+
+       confirmante.                    idempotencia.                al confirmante.
+
+       Orden confirmada, clave de Resultado financiero con          El resultado confirmado
+
+RF-05 idempotencia y datos de          identificador de operación y contiene identificador
+
+       correlación.                    fecha efectiva.              financiero y fecha efectiva.
+
+          Clave de idempotencia y      Resultado existente,         Repetir la misma solicitud
+RF-06 huella del contenido de la       conflicto o estado por       devuelve el resultado existente;
+                                       verificar.                   una clave con datos diferentes
+          solicitud.                                                se rechaza.
+
+          Desembolso confirmado,       Evento de entrega y          El mensaje se conserva hasta su
+RF-07 crédito, importe, moneda y       confirmación de recepción    confirmación y puede
+                                       de Cobranza.                 reenviarse sin duplicar la
+          fecha efectiva.                                           activación.
+
+RF-08  Identificador de orden, de      Estado, referencias de       Una persona autorizada puede
+       crédito o de cliente.           operación y constancia.      identificar el resultado sin
+                                                                    ejecutar nuevamente.
+
+          Órdenes del periodo,         Reporte de diferencias para  Se pueden comparar orden,
+RF-09 confirmaciones del CORE y        revisión.                    confirmación del CORE y
+                                                                    recepción de Cobranza.
+          acuses de Cobranza.
+
+                                                                    La solicitud referencia la
+
+RF-10  Operación original, motivo y    Solicitud de reversión       operación original y conserva
+       autorización del supervisor.    trazable y su resultado.     motivo, autorización y
+
+                                                                    resultado.
+
+    Tabla 7. Entradas, salidas y criterios de aceptación de los requerimientos funcionales.
+
+Los requerimientos RF-01 y RF-03 a RF-10 desarrollan la solución propuesta y no
+constituyen una transcripción literal de la consigna.
+
+8. REQUERIMIENTOS NO FUNCIONALES
+
+ID     Requerimiento                   Prioridad                   Evidencia prevista
+
+RNF-   Consistencia financiera Alta               Prueba de que una falla interna del CORE no deja
+01                                                confirmado solo el abono o solo el asiento.
+
+RNF- Seguridad y mínimo                Alta       Pruebas de acceso no autorizado y de acceso a
+                                                  créditos ajenos.
+02     privilegio
+
+RNF- Recuperación e                    Alta       Pruebas de reintento, concurrencia y pérdida de
+                                                  respuesta.
+03     idempotencia
+
+RNF-   Auditoría                       Alta       Correlación completa entre orden, validación y
+04                                                operación externa, sin exponer secretos.
+
+RNF-   Interoperabilidad               Alta       Contratos REST y JSON versionados, ejemplos de
+05                                                mensajes y errores compatibles con el Bus.
+
+                                                  Se propone un percentil noventa y cinco de ejecución
+
+RNF-   Rendimiento                     Media      de hasta tres segundos, excluyendo la interacción
+06                                                humana. Carga y condiciones pendientes de acuerdo
+
+                                                  y medición.
+ID    Requerimiento  Prioridad                    Evidencia prevista
+
+                                Configuración separada por ambiente, registros,
+
+RNF-  Operabilidad   Media      alertas y procedimientos de recuperación. Metas de
+07                              disponibilidad, RPO y RTO pendientes de
+
+                                Infraestructura.
+
+      Tabla 8. Requerimientos no funcionales del módulo.
+
+9. ARQUITECTURA DE NEGOCIO
+
+    El proceso principal se ejecuta en agencia y se apoya en las reglas RN-01 a RN-10. La
+    figura siguiente muestra la secuencia de validación, confirmación, ejecución y entrega,
+    así como el tratamiento de un resultado incierto.
+
+                            Figura 1. Flujo del desembolso y tratamiento de resultados.
+
+    El proceso propone una unidad atómica en el CORE. La arquitectura general muestra
+    persistencia ACID, pero no define por sí sola el alcance de esa transacción. CORE, Cuentas
+    y el Comité de Tecnología deben confirmarlo. Si el diseño definitivo divide ambas
+    escrituras, se requiere documentar otro protocolo completo de recuperación antes de
+    implementar.
+
+    La revalidación previa a la ejecución responde a RN-06: entre la preparación de la orden
+    y su confirmación pueden cambiar la vigencia de la aprobación o el estado de la cuenta
+    informado por Cuentas.
+
+10. CASOS DE USO DEL MÓDULO
+
+    Los casos de uso se documentan con la plantilla estándar de la Línea de Créditos. La tabla
+    resumen presenta el código, el nombre, los actores y los módulos involucrados; a
+    continuación se desarrolla cada caso con precondiciones, flujo principal, poscondiciones
+    y excepciones.
+   ID            Caso de uso     Actores                             Módulos involucrados
+CU-01
+       Consultar créditos        Operador de agencia                 13, 12
+CU-02  habilitados
+
+CU-03  Validar cliente y cuenta  Operador de agencia,                13, Clientes, Cuentas,
+
+CU-04  destino                   cliente titular                     Seguridad
+
+CU-05  Confirmar y ejecutar el   Operador de agencia                 13, Bus, CORE, Cuentas,
+CU-06  desembolso                                                    Seguridad
+CU-07
+       Consultar resultado y     Operador de agencia                 13, CORE
+       constancia
+
+       Entregar el desembolso a  Servicio del módulo                 13, 14, Bus
+       Cobranza
+
+       Conciliar operaciones     Responsable autorizado 13, CORE, 14
+
+       Solicitar reversión       Supervisor autorizado               13, CORE, Bus
+
+                 Tabla 9. Resumen de casos de uso del módulo de Desembolso.
+
+                       Figura 2. Casos de uso y actores del módulo.
+
+La vista representa los casos de uso principales y sus actores. Las relaciones con los
+sistemas externos corresponden a asociaciones funcionales; el transporte de integración
+se realiza mediante el Bus de Servicios. El caso CU-07 se mantiene como extensión
+condicionada a la política de reversión.
+
+Especificación CU-01.
+
+Código           CU-01
+Nombre           Consultar créditos habilitados
+Módulo
+responsable      13. Desembolso
+Actores
+Módulos          Operador de agencia
+involucrados
+Precondiciones   13. Desembolso, 12. Evaluación
+
+Flujo principal  El operador está autenticado y autorizado. Existe al menos una aprobación
+                 registrada por Evaluación.
+Poscondiciones   1. El operador ingresa el identificador del cliente o del crédito. 2. El módulo
+                 consulta a Evaluación las aprobaciones asociadas. 3. El módulo muestra crédito,
+                 cliente, importe, moneda, estado y vigencia. 4. El operador selecciona un crédito
+                 habilitado.
+                 Queda seleccionado un crédito con aprobación habilitada para iniciar la
+                 preparación de la orden.
+Excepciones      E1. No existen aprobaciones para el criterio de búsqueda: se informa sin habilitar
+                 continuación. E2. La aprobación está vencida o revocada: se muestra el motivo y
+                 no se permite continuar. E3. Evaluación no responde: se informa la
+                 indisponibilidad y se registra el intento.
+
+Especificación CU-02.
+
+Código           CU-02
+Nombre           Validar cliente y cuenta destino
+Módulo
+responsable      13. Desembolso
+Actores
+Módulos          Operador de agencia, cliente titular
+involucrados
+Precondiciones   13. Desembolso, Clientes, Cuentas, Seguridad
+
+Flujo principal  Existe un crédito habilitado seleccionado. El cliente está presente en la agencia.
+                 1. El módulo solicita a Clientes la validación de identidad del titular. 2. Clientes
+Poscondiciones   devuelve una referencia de validación y su resultado. 3. El módulo solicita a
+                 Cuentas la elegibilidad de las cuentas del titular. 4. El operador selecciona la
+Excepciones      cuenta de ahorros destino. 5. El módulo asocia las evidencias a la orden en
+                 preparación.
+                 La orden conserva la referencia de validación de identidad y la cuenta destino
+                 verificada.
+                 E1. Validación de identidad rechazada: la orden no avanza y se registra el intento.
+                 E2. No existe cuenta elegible: se informa y no se habilita la confirmación. E3.
+                 Moneda de la cuenta distinta a la del crédito: se bloquea el escenario base y se
+                 deriva a la ampliación pendiente.
+
+Especificación CU-03.
+
+Código           CU-03
+Nombre           Confirmar y ejecutar el desembolso
+Módulo
+responsable      13. Desembolso
+Actores
+Módulos          Operador de agencia
+involucrados
+Precondiciones   13. Desembolso, Bus de Servicios, CORE, Cuentas, Seguridad
+
+Flujo principal  Aprobación habilitada, cuenta elegible, validación de identidad satisfactoria y
+                 permisos verificados.
+Poscondiciones   1. El módulo muestra el resumen de la operación. 2. El operador confirma. 3. El
+                 módulo revalida aprobación y cuenta. 4. El módulo persiste la orden con su clave
+Excepciones      de idempotencia. 5. El módulo solicita al CORE, por el Bus, el abono y su asiento.
+                 6. El CORE devuelve el resultado con identificador de operación y fecha efectiva.
+                 7. El módulo actualiza la orden y crea el evento de entrega a Cobranza.
+                 Existe una operación financiera confirmada y una comunicación a Cobranza
+                 registrada para entrega.
+                 E1. Validación rechazada en la revalidación: se cancela sin invocar al CORE. E2.
+                 Conflicto de duplicidad: se devuelve el resultado existente. E3. Servicio
+                 indisponible o respuesta perdida: la orden queda por verificar y no se habilita otra
+                 ejecución independiente. E4. Rechazo del CORE: la orden queda rechazada con el
+                 motivo registrado.
+
+Especificación CU-04.
+
+Código           CU-04
+Nombre           Consultar resultado y constancia
+Módulo
+responsable      13. Desembolso
+Actores
+                 Operador de agencia
+Módulos          13. Desembolso, CORE
+involucrados
+Precondiciones   Existe una orden registrada y el consultante cuenta con permisos sobre ella.
+                 1. El operador ingresa el identificador de la orden, del crédito o del cliente. 2. El
+Flujo principal  módulo muestra el estado financiero y el estado de entrega a Cobranza. 3. Si el
+                 estado es incierto, el módulo consulta al CORE por la misma referencia. 4. Con
+Poscondiciones   confirmación financiera, el módulo habilita la constancia.
+Excepciones      El consultante conoce el resultado sin generar una nueva ejecución.
+                 E1. Orden inexistente: se informa sin revelar datos de terceros. E2. Consulta sin
+                 permisos: se rechaza y se registra en auditoría.
+
+Especificación CU-05.
+
+Código           CU-05
+Nombre           Entregar el desembolso a Cobranza
+Módulo
+responsable      13. Desembolso
+Actores
+Módulos          Servicio del módulo
+involucrados
+Precondiciones   13. Desembolso, 14. Cobranza, Bus de Servicios
+
+Flujo principal  Existe un desembolso con confirmación financiera y un evento de entrega
+                 pendiente.
+Poscondiciones   1. El servicio toma el evento pendiente. 2. El servicio envía a Cobranza el crédito,
+                 la operación del CORE, el importe, la moneda, la fecha efectiva y la versión de
+Excepciones      condiciones. 3. Cobranza confirma la recepción. 4. El servicio marca el evento
+                 como confirmado.
+                 Cobranza dispone de la información necesaria para administrar el crédito
+                 desembolsado.
+                 E1. Cobranza no disponible: el evento permanece pendiente y se reintenta con
+                 espera creciente. E2. Reenvío del mismo evento: Cobranza no activa dos veces el
+                 mismo crédito. E3. Se supera la política de reintentos: se genera alerta para
+                 revisión operativa.
+
+Especificación CU-06.
+
+Código           CU-06
+Nombre           Conciliar operaciones
+Módulo
+responsable      13. Desembolso
+Actores
+Módulos          Responsable autorizado
+involucrados
+Precondiciones   13. Desembolso, CORE, 14. Cobranza
+
+Flujo principal  Existe un periodo cerrado con órdenes ejecutadas y acuses registrados.
+                 1. El responsable solicita la conciliación del periodo. 2. El módulo compara las
+Poscondiciones   órdenes propias con las confirmaciones del CORE y con los acuses de Cobranza. 3.
+                 El módulo presenta las diferencias encontradas.
+Excepciones      Las diferencias quedan identificadas y disponibles para su revisión.
+                 E1. Información incompleta de un origen: se informa el faltante y no se emite una
+                 conciliación parcial como definitiva.
+
+Especificación CU-07.
+
+Código           CU-07
+Nombre           Solicitar reversión
+Módulo
+responsable      13. Desembolso
+Actores
+                 Supervisor autorizado
+Módulos             13. Desembolso, CORE, Bus de Servicios
+involucrados
+Precondiciones      Existe una operación confirmada, una política de reversión aprobada y un
+                    supervisor autorizado.
+Flujo principal     1. El supervisor selecciona la operación y registra el motivo. 2. El módulo verifica
+                    la autorización. 3. El módulo solicita al CORE una reversión con clave propia que
+Poscondiciones      referencia la operación original. 4. El módulo registra el resultado y conserva el
+Excepciones         historial.
+                    La reversión queda registrada como operación independiente y trazable.
+                    E1. Política de reversión no aprobada: la solicitud no puede ejecutarse. E2.
+                    Autorización insuficiente: se rechaza y se registra en auditoría. E3. Rechazo del
+                    CORE: se conserva el motivo sin alterar la operación original.
+
+11. ARQUITECTURA DE DATOS
+
+Entidades propias propuestas.
+
+Entidad                        Campos principales                          Responsabilidad
+
+                    id, aprobacionId, versionAprobacion, creditoId,
+
+OrdenDesembolso     clienteId, cuentaId, importe, moneda, estado,        Intención y resultado
+                    idempotencyKey, requestHash, coreOperacionId,        operativo del desembolso.
+
+                    fechaEfectiva, version
+
+Validacion          id, ordenId, tipo, proveedor, referenciaEvidencia,   Evidencia de identidad,
+                    resultado, fecha, vencimiento si aplica              cuenta y autorización. No
+                                                                         almacena biometría cruda.
+
+EventoEntrega       id, ordenId, tipo, versionEsquema, estado,           Entrega durable a Cobranza.
+                    intentos, siguienteIntento, confirmacionId
+
+RegistroAuditoria   id, ordenId, actorId, accion, fecha, correlationId,  Reconstrucción de acciones
+                    resultado                                            y cambios.
+
+SolicitudReversion  id, ordenId, motivo, solicitanteId, autorizacionId,  Seguimiento de reversión,
+                    estado, coreReversionId                              sujeto a política aprobada.
+
+                    Tabla 10. Entidades propias del módulo de Desembolso.
+
+                         Figura 3. Modelo de entidades y relaciones del módulo.
+
+Los identificadores externos son referencias lógicas verificadas por interfaces, no llaves
+foráneas hacia tablas de otros módulos. Esta decisión es coherente con el principio PA-
+04 y con el criterio de intercambio por servicios de la matriz transversal. El esquema físico
+debe acordarse con Infraestructura y CORE.
+    Integridad y ciclo de vida.
+
+    Se emplean importes decimales de precisión fija, moneda explícita, identificadores
+    únicos y control de concurrencia. El CORE mantiene el control definitivo de duplicidad
+    por operación de negocio. Desembolso mantiene una intención durable antes de llamar
+    al CORE y consulta por la misma referencia si pierde la respuesta.
+
+    Los estados propuestos de la orden son PREPARADA, VALIDADA, EN_PROCESO,
+    POR_VERIFICAR, CONFIRMADA y RECHAZADA. El estado de entrega a Cobranza es
+    independiente y toma los valores PENDIENTE o CONFIRMADA. Una reversión confirmada
+    agrega el estado financiero REVERTIDA y conserva el historial. Una orden validada debe
+    volver a comprobar las condiciones que puedan haber cambiado antes de ejecutar.
+
+    Al recuperar una confirmación del CORE, Desembolso actualiza la orden y crea el evento
+    de entrega en una transacción local. Un proceso de recuperación consulta las órdenes en
+    estado EN_PROCESO o POR_VERIFICAR para resolver una caída ocurrida después del
+    registro financiero y antes de la actualización local. Retención, anonimización y plazos de
+    conservación quedan por definir con los responsables del proyecto.
+
+12. ARQUITECTURA DE APLICACIONES E INTERFACES
+
+       Figura 4. Componentes e integración del módulo de Desembolso.
+
+El repositorio del módulo representa propiedad lógica; su despliegue físico queda por
+acordar. El Bus conserva enrutamiento, seguridad transversal, idempotencia de
+transporte y gestión de extornos. La unicidad financiera se verifica también en el CORE:
+un control solo en el Bus no basta para proteger escrituras concurrentes o
+recuperaciones.
+
+Catálogo de contratos propuestos.
+
+ID     Interfaz            Operación y datos mínimos             Resultado y estado
+                     Consultar aprobación: id, crédito,  Habilitada o motivo de rechazo.
+IF-01  Evaluación a  cliente, monto, moneda, estado,     Dependencia interna de la línea,
+       Desembolso    versión y vigencia si aplica.       por detallar con el enlace.
+ ID    Interfaz           Operación y datos mínimos                Resultado y estado
+IF-02
+IF-03  Clientes a         Validar cliente: clienteId y referencia  Referencia de validación,
+IF-04  Desembolso         de desafío o evidencia.                  resultado y vigencia. No se
+IF-05                                                              intercambia biometría cruda.
+IF-06
+                                                                   Titularidad, estado, moneda y
+IF-07
+IF-08  Cuentas a          Consultar elegibilidad: clienteId,       restricciones. Dependencia
+IF-09
+       Desembolso         cuentaId y moneda.                       reconocida en la matriz
+
+                                                                   transversal.
+
+       Solicitud de       Consultar condiciones aprobadas:         Condiciones y referencias
+       Crédito a          crédito y versión.                       documentales aplicables al
+       Desembolso                                                  producto.
+
+       Seguridad a Bus y  Validar identidad del consumidor y       Permiso o rechazo y referencia
+       Desembolso         autorización sobre operación y           de decisión antifraude cuando
+                          recurso.                                 aplique.
+
+       CORE a             Ejecutar y consultar desembolso:         Estado definitivo o pendiente,
+       Desembolso         ordenId, aprobación, cuenta,             operación financiera y fecha
+                          importe, moneda, clave y correlación.    efectiva. Atomicidad pendiente
+                                                                   de acuerdo.
+
+       Desembolso a       Desembolso confirmado: eventoId,         Confirmación idempotente.
+       Cobranza           crédito, operación del CORE, importe,    Acuerdo sobre calendario y
+                          moneda, fecha efectiva y versión de      activación pendiente.
+                          condiciones.
+
+       CORE a             Reversión: operación original,           Reversión confirmada o rechazo.
+       Desembolso         motivo, autorización y clave propia.     El Bus coordina según el
+                                                                   estándar común.
+
+       Desembolso a       Preparar, confirmar y consultar una      Estado, errores funcionales y
+                                                                   constancia, sin exposición de
+       canal de agencia orden.                                     datos innecesarios.
+
+               Tabla 11. Catálogo de interfaces del módulo de Desembolso.
+
+Todas estas interfaces son borradores funcionales, no APIs ya implementadas. El
+transporte adopta REST y JSON a través del Bus de Servicios, en aplicación del criterio
+general establecido en la Matriz de Dependencias e Intercambio de Datos y sujeto a los
+acuerdos definitivos de arquitectura. Si el Bus ofrece mensajería, IF-07 puede publicarse
+como evento; en caso contrario se utiliza un emisor durable que reintente una llamada
+idempotente. No se presupone un producto de mensajería.
+
+Sobre el calendario de pagos persiste una diferencia entre fuentes: el diagrama general
+indica que Desembolso origina el cronograma, mientras que la consigna incluye el
+calendario entre las funciones de Solicitud de Crédito y el Comité de Créditos señala que
+el crédito generado debe poder ser administrado por Cobranza. Se propone que Solicitud
+conserve el cálculo y la persistencia del calendario, que Desembolso dispare su activación
+con la fecha efectiva y que Cobranza lo administre. Esta propuesta se eleva al Comité de
+Créditos como PC-01 y debe resolverse antes de cerrar IF-07.
+
+13. ARQUITECTURA DE TECNOLOGÍA
+
+     Elemento                                     Diseño propuesto y dependencia
+Acceso               Pantalla de agencia que consume el Bus por HTTPS. El rótulo REST del diagrama
+Servicio             general no sustituye la protección del transporte.
+Integración          Aplicación de Desembolso desplegable sobre la plataforma común. Lenguaje y
+Seguridad            framework pendientes.
+                     API Gateway y ESB de la arquitectura general, con rutas y contratos REST y JSON
+                     versionados.
+                     Servicio central con autenticación, OAuth2 y antifraude. Flujo, credenciales y
+                     permisos por acordar.
+Elemento        Diseño propuesto y dependencia
+
+Persistencia    Base relacional ACID del CORE para el registro financiero. Ubicación de las tablas
+                operativas de Desembolso pendiente.
+
+Recuperación    Proceso durable para consultar operaciones inciertas y reenviar entregas a
+                Cobranza.
+
+Observabilidad  Registros con correlación y métricas de ejecución, duplicidad, órdenes inciertas y
+                antigüedad de entregas pendientes.
+
+Ambientes       Desarrollo, Testing y Producción, administrados con Infraestructura y Calidad.
+
+              Tabla 12. Elementos de la arquitectura de tecnología del módulo.
+
+                                Figura 5. Despliegue lógico del módulo por ambiente.
+
+    Esta vista se aplica separadamente a Desarrollo, Testing y Producción, y no implica
+    compartir datos, credenciales ni servicios entre ambientes. Desarrollo utiliza datos
+    sintéticos y simuladores de contratos; Testing verifica integración y fallas; Producción
+    recibe versiones aprobadas por el proceso del proyecto. Capacidad, servidores, motor de
+    base de datos, respaldo y objetivos de recuperación se completan con Infraestructura.
+    La salida general del BNA está prevista para el 1 de diciembre de 2026 según el caso.
+
+14. ESTÁNDARES DE INTEGRACIÓN Y SEGURIDAD
+     • Contratos documentados y versionados sobre REST y JSON a través del Bus de
+         Servicios, conforme al criterio general de la matriz transversal. Se propone OpenAPI
+         para la descripción de los contratos HTTP, sujeta al estándar que fije el Comité de
+         Tecnología.
+     • Mensajes con identificador de solicitud, correlación, fecha, versión y errores
+         estructurados. Importes como decimales exactos según el contrato, nunca cálculos
+         monetarios con flotantes binarios.
+     • Clave de idempotencia vinculada a la huella del contenido. Misma clave y contenido
+         devuelve el resultado existente; misma clave y contenido diferente produce
+         conflicto. Una reversión usa su propia clave y referencia la operación original.
+     • Autenticación de servicio y autorización sobre crédito, cliente y operación. Los
+         controles se mantienen al atravesar el Bus.
+     • Comunicación cifrada, secretos fuera del código y enmascaramiento de cuentas y
+         datos personales en los registros.
+
+     • Validación de identidad mediante Clientes. Desembolso conserva referencias de
+         evidencia, no huellas ni imágenes faciales.
+     • Límites de tiempo y reintentos acotados por contrato. Ante un resultado financiero
+         incierto se consulta y se recupera; no se aplica reversión automática basada
+         únicamente en un tiempo de espera agotado.
+
+     • Entrega a Cobranza al menos una vez con consumidor idempotente. Alertas y
+         revisión operativa cuando se supere la política de reintentos o de antigüedad.
+
+     • Auditoría de preparación, confirmación, resultado, consulta sensible y reversión.
+         Acceso restringido y protección frente a alteraciones, bajo el estándar central.
+
+15. BOCETOS FUNCIONALES DE PANTALLAS
+
+Los prototipos funcionales representan los campos y acciones previstos para la operación
+en agencia. Su propósito es validar la interacción antes del desarrollo y guardan
+correspondencia con los casos de uso CU-01 a CU-04.
+
+Pantalla 1. Consulta de créditos.
+
+      Campo o acción                                   Comportamiento
+
+Búsqueda                      Identificador del cliente o del crédito.
+
+Resultados                    Crédito, cliente, importe, moneda y estado de aprobación.
+
+Preparación                   Selección de un crédito habilitado.
+
+Pantalla 2. Preparación.
+
+      Campo o acción                                   Comportamiento
+
+Cliente y crédito             Referencias y documento enmascarado.
+
+Identidad                     Estado y acción de validación del cliente.
+
+Cuenta destino                Selección entre las cuentas de ahorros elegibles.
+
+Importe y moneda              Valores derivados de la aprobación.
+
+Continuación                  Revisión del resumen con las validaciones completas.
+
+Pantalla 3. Confirmación.
+
+        Campo o acción                                          Comportamiento
+ Resumen                      Cliente, crédito, cuenta enmascarada, importe y moneda.
+ Acciones                     Retorno a preparación o confirmación del desembolso.
+
+Pantalla 4. Resultado.
+
+      Campo o acción                                   Comportamiento
+
+Estado financiero             Confirmado, rechazado o en verificación.
+
+Referencia                    Operación del CORE y fecha efectiva.
+
+Entrega a Cobranza            Pendiente o confirmada.
+
+Acciones                      Consulta de estado y acceso a la constancia cuando corresponda.
+
+La acción de confirmar solo se habilita tras completar las validaciones. Mientras la
+
+operación está en proceso o por verificar, la interfaz permite consultar el estado sin crear
+
+otra orden. La constancia financiera se muestra únicamente con confirmación del CORE
+
+y la entrega a Cobranza se informa por separado. Los mensajes de rechazo deben explicar
+
+cómo corregir los datos sin revelar reglas sensibles de seguridad.
+
+16. RIESGOS, DECISIONES Y TRAZABILIDAD
+
+ID                    Riesgo                           Tratamiento propuesto
+
+R-01  El CORE no ofrece registro        Resolver IF-06 con CORE y Cuentas. No asumir que ACID
+      atómico del abono y del asiento.  cubre dos servicios independientes.
+
+R-02  El CORE confirma pero se pierde   Intención persistida, consulta por referencia y
+      la respuesta.                     recuperación. Unicidad de negocio en el CORE.
+
+R-03 Cobranza no recibe el resultado.   Evento durable, reintentos idempotentes, alerta y
+                                        conciliación.
+
+R-04  Reglas propuestas se presentan    Registrar estado, responsable y referencia de acta de
+      como aprobadas.                   cada decisión.
+ID                      Riesgo                             Tratamiento propuesto
+
+R-05   Módulos externos o ambientes se Contratos tempranos, simuladores y seguimiento con el
+
+       retrasan.                          Comité PMI.
+
+R-06   La aprobación o la cuenta          Acordar revalidación, control de versión y mecanismo de
+       cambian durante la ejecución.      reserva o consumo de la aprobación.
+
+R-07   Se adoptan reglas del Diccionario  Clasificar el origen de cada regla en la tabla 5 y confirmar
+       de Ahorros como propias de         su aplicabilidad con el enlace del Comité de Créditos.
+       Créditos.
+
+R-08   Los cinco módulos de la línea      Usar la plantilla estándar de requerimientos y casos de
+       diseñan interfaces incompatibles.  uso y elevar toda dependencia nueva como propuesta de
+                                          cambio.
+
+                  Tabla 13. Riesgos identificados y tratamiento propuesto.
+
+      Decisión propuesta        Requerimiento Evidencia de diseño                 Estado
+
+Registro financiero             RF-05, RNF-01 Proceso e IF-06               Pendiente de CORE,
+indivisible en el CORE                                                      Cuentas y Tecnología.
+
+Clave técnica y unicidad por    RF-06, RNF-03  Modelo y estándares          Pendiente de Bus y CORE.
+crédito o aprobación
+
+Referencias de identidad sin    RF-02, RNF-02  Entidad Validacion e IF- Pendiente de Clientes y
+biometría local
+                                               02                           Seguridad.
+
+Entrega durable a Cobranza      RF-07, RNF-03  Entidad EventoEntrega        Pendiente de Cobranza y
+                                               e IF-07                      Bus.
+
+Persistencia operativa de       RF-09, RNF-07 Modelo y despliegue           Pendiente de CORE e
+Desembolso                                                                  Infraestructura.
+
+Activación y cálculo del        RF-07          IF-07 y PC-01                Pendiente de Solicitud,
+calendario                                                                  Desembolso y Cobranza.
+
+Abono sobre cuenta de           RF-03          RN-10 e IF-03                Reconocida en la matriz
+ahorros del titular                                                         transversal.
+
+Transporte REST y JSON por      RNF-05         Estándares e IF-01 a IF-     Criterio general de la
+el Bus                                         09                           matriz, sujeto a acuerdo
+                                                                            definitivo.
+
+       Tabla 14. Registro de decisiones y su estado de aprobación.
+
+El Comité de Tecnología y los responsables indicados formalizan las decisiones mediante
+actas. El estado de cada decisión permanece pendiente hasta que exista una referencia
+verificable del acuerdo.
+
+17. PROPUESTAS DE CAMBIO Y COORDINACIÓN CON EL COMITÉ DE CRÉDITOS
+
+Conforme al mecanismo establecido por el Comité de Créditos, toda necesidad de
+información no prevista o toda interacción adicional con otros módulos se comunica al
+enlace asignado antes de incorporarse al diseño. El registro siguiente deja constancia de
+las propuestas abiertas por el módulo 13.
+
+ID                            Propuesta                           Módulos             Estado
+                                                                involucrados    Enviada al enlace
+PC-01  Definir la propiedad del cálculo y de la            11, 13, 14           Enviada al enlace
+PC-02  persistencia del calendario de pagos, y el rol de                        En coordinación
+PC-03  Desembolso en su activación.                        12, 13               En coordinación
+PC-04  Precisar el contenido, la versión y la vigencia de
+       la aprobación que Evaluación entrega a              13, Cuentas
+       Desembolso.
+       Confirmar con Cuentas el contrato de                13, CORE, Seguridad
+       elegibilidad y el mecanismo de abono sobre la
+       cuenta de ahorros del titular.
+       Acordar con CORE y Seguridad el alcance de la
+       transacción financiera y el modelo de
+       autorización de la operación.
+  ID                       Propuesta                          Módulos                  Estado
+PC-05                                                       involucrados
+
+       Definir la política de reversión de un desembolso  13, 14, CORE                 Pendiente
+       confirmado y la autorización requerida.
+
+       Tabla 15. Registro de propuestas de cambio del módulo de Desembolso.
+
+18. PLAN DE TRABAJO PROPUESTO
+
+El plan considera diez días hábiles relativos para consolidar la Fase I. El día uno
+corresponde al inicio aprobado por el Comité PMI. Las responsabilidades se asignan por
+función dentro del equipo de Desembolso y las fechas calendario se fijan conforme al
+cronograma general del proyecto.
+
+          Actividad            Responsable      Tiempo Dependencia                         Producto
+                                 propuesto
+Validar alcance y reglas                        Días 1 a 2  Comité de                  Alcance y reglas
+con la línea               Líder y responsable  Días 2 a 4  Créditos y enlace          registradas.
+                           de negocio                       del módulo
+                                                            CORE, Cuentas,             Borradores
+Acordar ejecución          Responsable de                   Evaluación, Bus y          revisados de
+financiera e interfaces    integración y líder              Seguridad                  contratos.
+                                                                                       Modelo y
+Modelar datos y estados    Responsable de       Días 3 a 5 Reglas e IF-06              catálogo.
+                           datos                                                       Diagramas y
+Completar proceso y casos                       Días 3 a 5 Alcance validado            fichas de casos
+de uso en plantilla        Responsable de                                              de uso.
+estándar                   negocio                                                     Vista de
+                                                                                       despliegue y
+Definir tecnología y       Responsable de       Días 4 a 6  Infraestructura y          estándares.
+ambientes                  tecnología                       Bus
+                                                                                       Bocetos
+Preparar pantallas         Responsable de       Días 5 a 6 Proceso y datos             funcionales.
+                           negocio e
+                           integración                                                 Propuestas
+                                                                                       enviadas y
+Elevar propuestas de       Líder                Días 5 a 7  Registro PC-01 a           respuestas
+cambio al enlace                                            PC-05                      registradas.
+
+Revisar riesgos y          Líder y todo el                     Diseños                 Matriz revisada
+trazabilidad               equipo               Días 7 a 8 anteriores y                y observaciones.
+
+Consolidar informe y       Líder y todo el                     Calidad                 Informe
+anexos                     equipo                                                      coherente.
+                                                Día 9       Actas disponibles          Exposición y
+                                                                                       respuestas
+Preparar y ensayar la      Todo el equipo       Día 10      Informe                    técnicas.
+sustentación                                                consolidado
+
+                       Tabla 16. Plan de trabajo propuesto para la Fase I.
+
+Las tareas de desarrollo funcional y las pruebas de integración se programan con el
+Comité PMI para la Fase II. La integración completa, el gobierno y la demostración final
+corresponden a la Fase III. La presente fase incluye el diseño funcional de pantallas y los
+criterios de aceptación; el alcance de una demostración ejecutable se coordina con la
+evaluación académica de la fase.
+
+19. VERIFICACIÓN PROPUESTA
+
+Los siguientes son escenarios previstos de verificación, no pruebas ya ejecutadas.
+
+                   Escenario                                       Resultado esperado
+Identidad inválida o cuenta no elegible     No se invoca la ejecución financiera.
+             Escenario                            Resultado esperado
+
+Dos confirmaciones concurrentes del   Una única operación financiera confirmada.
+mismo crédito
+
+Misma clave con importe distinto      Conflicto. No se modifica la operación original.
+
+El CORE confirma y se pierde la respuesta La consulta recupera el resultado sin duplicar el abono.
+
+Falla dentro del registro financiero  Abono y asiento se confirman juntos o ninguno se
+                                      confirma.
+
+Cobranza no está disponible           El desembolso permanece confirmado y la entrega queda
+                                      pendiente.
+
+Reenvío del mismo evento a Cobranza Cobranza no activa dos veces el mismo crédito.
+
+Solicitud de acceso sin permisos      Rechazo y registro de auditoría.
+
+Cuenta destino en moneda distinta a la El escenario base se bloquea y se deriva a la ampliación
+
+del crédito                           pendiente.
+
+             Tabla 17. Escenarios de verificación previstos.
+
+20. CONCLUSIONES
+
+    La arquitectura propuesta delimita la responsabilidad de Desembolso en la validación del
+    cliente, la preparación y ejecución controlada de la orden y la comunicación del resultado
+    a Cobranza. El diseño conserva la integración por el Bus de Servicios y la autoridad
+    financiera del CORE, conforme a la estructura general del BNA.
+
+    La incorporación de los acuerdos de la Línea de Créditos permite que el módulo se
+    documente con la misma estructura que los otros cuatro módulos de la línea. Los
+    requerimientos y los casos de uso quedan codificados con módulo responsable,
+    prioridad, regla asociada, entradas, salidas, criterios de aceptación, actores, módulos
+    involucrados, precondiciones, poscondiciones, flujo principal y excepciones, lo que
+    facilita la revisión y la integración posterior.
+
+    La integridad del proceso depende de tres acuerdos verificables: el alcance de la
+    transacción financiera en el CORE, la unicidad de la operación de negocio y la
+    responsabilidad sobre el calendario de pagos. El registro de decisiones y el registro de
+    propuestas de cambio identifican a los responsables de resolverlos antes de la
+    implementación integrada.
+
+    Las vistas de negocio, datos, aplicaciones y tecnología mantienen trazabilidad con los
+    requerimientos y los criterios de aceptación. El plan de trabajo organiza su consolidación
+    y constituye la base para el desarrollo y las pruebas de la siguiente fase.
+21. REFERENCIAS
+
+    Comité de Créditos del BNA. (2026). Organización de la Fase I de la Línea de Créditos.
+             Comunicación interna a los módulos 10 a 14. Escuela Profesional de Ingeniería de
+             Sistemas, Universidad Católica de Santa María.
+
+    Comité de Créditos del BNA. (2026). Diccionario de Reglas de Negocio. Línea de Créditos
+             BNA [documento compartido].
+
+    Comité de Créditos del BNA. (2026). Matriz de Dependencias e Intercambio de Datos.
+             Línea de Créditos BNA [documento compartido].
+
+    Comité de Créditos del BNA. (2026). Plantilla Estándar de Requerimientos y Casos de Uso.
+             Línea de Créditos BNA [documento compartido].
+
+    Equipo del módulo de Desembolso. (2026). Informe de arquitectura del módulo 13,
+             versión del 6 de setiembre de 2026. Antecedente del presente documento.
+
+    Proyecto BNA. (2026). Diagrama de arquitectura general por capas: canales, gobierno e
+             integración, módulos de negocio y núcleo CORE.
+
+    Universidad Católica de Santa María. (2026). Trabajo grupal integrador. Arquitectura del
+             Banco Nacional de Arequipa. Fases I, II y III [guía del curso]. Escuela Profesional
+             de Ingeniería de Sistemas, Gestión de Sistemas y Tecnologías de la Información.
+ANEXO A. CORRESPONDENCIA CON LOS ENTREGABLES DE LA FASE I
+
+Entregable de la consigna            Ubicación en el                   Evidencia
+                                         informe
+
+Alcance, stakeholders y          Secciones 2, 4, 6, 7 y  Alcance delimitado, interesados, reglas
+requerimientos                   8                       codificadas y requerimientos con criterios de
+                                                         aceptación.
+
+Arquitectura general y           Secciones 1, 3, 9, 11, Contexto del BNA, posición en la línea y
+
+específica                       12 y 13                 cuatro vistas del módulo.
+
+Dependencias e interfaces        Secciones 3 y 12        Tablas 1 y 2, catálogo IF-01 a IF-09 y
+entre módulos                                            componentes.
+
+Diagramas de flujo, datos, Secciones 9, 10, 11 y Figuras 1 a 5, fichas CU-01 a CU-07 y bocetos
+
+casos de uso y pantallas         15                      funcionales.
+
+Estándares comunes de            Sección 14              Contratos REST y JSON, idempotencia,
+integración y seguridad                                  autorización y recuperación.
+
+Plan de trabajo con              Sección 18              Cronograma relativo por función y
+actividades, responsables y                              dependencias.
+tiempos
+
+Justificación y trazabilidad de  Secciones 16, 17 y 19   Riesgos, registro de decisiones, propuestas de
+las decisiones                                           cambio y criterios de verificación.
+
+Tabla 18. Correspondencia entre los entregables exigidos y el contenido del informe.
+

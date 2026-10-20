@@ -1,0 +1,118 @@
+      ACTA DE REUNIÓN SEMANAL OFICIAL
+
+Proyecto Integrador | Línea de Créditos | Módulo de DESEMBOLSO
+
+Nombre del Comité /         Módulo de Desembolso (Línea de Créditos)
+Módulo:
+Código de Acta de Control:  ACT-2026-007
+Fecha y Hora de Sesión:     18/10/2026 a las 9:00 a. m.
+Modalidad:                  Presencial
+                            1. Centeno Lopez Jose Alfredo
+Alumnos Asistentes y        2. Nuñez Arista Piero Bruker
+Firmas:                     3. Reaño Soto Iván Edgardo
+                            4. Sucapuca Santamarina Rodrigo Alonso
+
+Agenda de la Reunión:       1. Verificación del cumplimiento de los acuerdos AC-28 a AC-39 de la
+                            sesión anterior.
+                            2. Revisión del avance del Catálogo de Servicios y de los Acuerdos de
+                            Niveles de Servicio del módulo (I-02).
+                            3. Revisión del Sistema de Valor del Servicio y de la Cadena de Valor
+                            para desembolso, consulta de estado y extorno (I-03).
+                            4. Revisión de los flujos de Gestión de Incidentes, Solicitudes de Servicio
+                            y Habilitación de Cambios (I-04).
+                            5. Seguimiento de las consultas técnicas sobre permisos, validación de
+                            cuenta, aprobación y registro contable.
+                            6. Consolidación de dudas pendientes para coordinación con Seguridad,
+                            Bus de Servicios y docente.
+
+Acuerdos Adoptados:         Seguimiento de la sesión anterior (ACT-2026-006): se revisan los
+                            acuerdos AC-28 a AC-39 y se registra su estado.
+                            • AC-28 (distinción entre servicios ofrecidos y consumidos): en proceso.
+                            Se revisa el catálogo y se mantiene separada la oferta propia de las
+                            dependencias externas.
+                            • AC-29 (alcance de los niveles de servicio): en proceso. El cierre
+                            continúa condicionado por la definición de permisos y por los tiempos de
+                            los módulos contraparte.
+                            • AC-30 (clasificación del extorno): cumplido. Se conserva la distinción
+                            entre solicitud de servicio por decisión del negocio e incidente cuando
+                            existe una falla técnica.
+                            • AC-33 a AC-36 (permisos, validaciones, movimiento contable y relación
+                            con Cobranza): pendientes de respuesta formal.
+                            • AC-37 y AC-38 (credenciales y registro de acceso): pendientes de
+                            confirmación por el Comité de Seguridad.
+                            • AC-39 (cierre de SLA): pendiente mientras no se aclare el mecanismo
+                            de integración y autorización.
+                            Acuerdos de la presente sesión:
+                       AC-40: Se acuerda continuar el diseño de la Fase II sin asumir acceso
+                       directo a tablas de otros módulos. Hasta contar con una respuesta formal,
+                       las validaciones externas se documentarán como servicios o dependencias
+                       de integración.
+                       AC-41: Se acuerda cerrar el Catálogo de Servicios diferenciando
+                       expresamente los servicios que ofrece Desembolso de los servicios que
+                       consume de Cuentas, Evaluación, Core/Contabilidad y Cobranza.
+                       AC-42: Se acuerda que el borrador de los Acuerdos de Niveles de
+                       Servicio mida únicamente el tiempo propio de procesamiento del módulo
+                       y deje los tiempos extremo a extremo como dependencias pendientes de
+                       confirmación.
+                       AC-43: Se acuerda completar el Sistema de Valor del Servicio y la
+                       Cadena de Valor tomando como eje los tres servicios ya identificados:
+                       ejecución del desembolso, consulta de estado y extorno. Las actividades
+                       externas se representarán como colaboraciones o dependencias, no como
+                       tareas controladas por el módulo.
+                       AC-44: Se acuerda documentar dos rutas para el extorno: solicitud de
+                       servicio cuando se origina por decisión del negocio dentro del plazo
+                       permitido, e incidente cuando responde a una falla técnica del módulo o
+                       de sus dependencias.
+                       AC-45: Se acuerda mantener abiertas las consultas sobre la validación de
+                       cuenta y aprobación, el responsable de ejecutar el movimiento de fondos y
+                       asiento contable, y el sentido de integración con Cobranza. No se
+                       modificará la línea base de la Fase I hasta recibir una definición formal.
+                       AC-46: Se acuerda consolidar como evidencia semanal el Catálogo de
+                       Servicios, el borrador de SLA, la Cadena de Valor y los flujos de
+                       Incidentes, Solicitudes y Cambios, manteniendo trazabilidad con las
+                       decisiones pendientes registradas en las actas anteriores.
+
+Responsables y Fechas  • Para AC-40 → Responsable: Iván Reaño → Plazo Límite: 19/10/2026
+Límite:                • Para AC-41 → Responsable: Jose Centeno, Piero Nuñez → Plazo
+                       Límite: 20/10/2026
+                       • Para AC-42 → Responsable: Piero Nuñez → Plazo Límite: 20/10/2026
+                       • Para AC-43 → Responsable: Jose Centeno → Plazo Límite: 22/10/2026
+                       • Para AC-44 → Responsable: Piero Nuñez → Plazo Límite: 22/10/2026
+                       • Para AC-45 → Responsable: Iván Reaño → Plazo Límite: 21/10/2026
+                       • Para AC-46 → Responsable: Rodrigo Sucapuca → Plazo Límite:
+                       23/10/2026
+
+Observaciones / Consultas al 1. ¿La validación de la cuenta destino y de la aprobación del crédito debe
+                       resolverse consumiendo los servicios de Cuentas y Evaluación
+Docente:
+                                         por el Bus, o requiere incorporar CUENTA_LEER y
+                                         EVALUACION_LEER al rol de Desembolso?
+                                         2. Si DESEMBOLSO_EJECUTAR solo cubre tablas des_*, ¿quién
+                                         ejecuta finalmente el abono, cta_transaccion y el asiento contable: el Bus
+                                         de Servicios con TRANSACCION_EJECUTAR u otro módulo?
+                                         3. ¿Cobranza debe consumir el evento de entrega generado por
+                                         Desembolso para activar el crédito, o Desembolso debe invocar
+                                         explícitamente un servicio de Cobranza?
+                                         4. ¿Es correcto comprometer en el SLA solo el tiempo propio del módulo
+                                         mientras las interfaces y tiempos de las dependencias externas no estén
+                                         confirmados?
+                                         5. Para I-03 e I-04, ¿qué evidencia concreta espera el docente además de
+                                         los diagramas y flujos documentados?
+
+Conformidad
+Los asistentes que suscriben ratifican los acuerdos adoptados en la presente sesión de coordinación.
+1. Centeno Lopez Jose Alfredo
+
+Firma
+
+2. Nuñez Arista Piero Bruker
+
+Firma
+
+3. Reaño Soto Iván Edgardo
+
+Firma
+4. Sucapuca Santamarina Rodrigo Alonso (Líder de Equipo)
+
+Firma
+
